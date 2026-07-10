@@ -1,0 +1,106 @@
+## .gitignore - C# / .NET 项目标准忽略规则
+## 适用于 Visual Studio + .NET Framework / .NET Core 项目
+
+# ============================
+# 构建产物与中间目录
+# ============================
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+artifacts/
+bld/
+
+# ============================
+# Visual Studio 临时文件
+# ============================
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.cache
+*.VC.db
+*.VC.VC.opendb
+
+# Visual Studio 工作区与 IDE 缓存目录
+.vs/
+.idea/
+*.opensdf
+*.sdf
+*.opendb
+*.vsp
+*.vsps
+*.pidb
+*.booproj
+*.svd
+*.mdb
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# TestResult 与覆盖率
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+TestResults/
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+
+# ============================
+# NuGet
+# ============================
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+# NuGet v3 的 project.json 还原目录
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ============================
+# 发布与部署
+# ============================
+*.publishsettings
+PublishScripts/
+*.pubxml
+!**/Properties/PublishProfiles/*.pubxml
+
+# ============================
+# 日志与临时文件
+# ============================
+*.log
+*.tlog
+*.tmp
+*.bak
+*.swp
+*~
+
+# ============================
+# 操作系统生成文件
+# ============================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# ============================
+# 敏感配置(本地数据库连接字符串等)
+# 防止误上传含密钥的本地配置
+# ============================
+appsettings.Local.json
+appsettings.Development.json
+*.secrets.json
+secrets.json
+Web.config.local
