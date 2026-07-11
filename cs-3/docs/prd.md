@@ -598,6 +598,8 @@ erDiagram
 ## 10. 代码差异化策略
 
 > **目的**：cs-3 与 cs-2 虽同为校园易购系统，但需在数据模型、命名规范、代码结构和 UI 布局上实现全面差异化，确保查重无风险。
+>
+> **更新说明**：cs-2 代码已于近期更新，从原始的单商品售卖（tbl_Sale）升级为订单+明细模型（tbl_Order + tbl_OrderItem），并增加了产地、生产日期、法人、注册日期等字段。以下差异化策略已根据 cs-2 最新代码状态重新校准。
 
 ### 10.1 项目与命名差异
 
@@ -606,41 +608,48 @@ erDiagram
 | 项目名称 | CampusShop | CampusMart |
 | 命名空间 | CampusShop | CampusMart |
 | 角色名称 | 管理员/普通用户 | 管理员/操作员 |
-| UI 导航 | Button 按钮导航 | MenuStrip 菜单栏导航 |
-| Form 命名 | LoginForm, MainForm, ProductForm... | FrmLogin, FrmMain, FrmGoods... |
-| Model 命名 | Product, Category, Supplier, Sale... | GoodsInfo, CategoryInfo, SupplierInfo, OrderInfo... |
-| BLL 命名 | ProductService, CategoryService... | GoodsBiz, CategoryBiz, SupplierBiz... |
-| DAL 命名 | ProductDAL, CategoryDAL... | GoodsDao, CategoryDao, SupplierDao... |
+| UI 导航 | Button 按钮垂直排列 | MenuStrip 菜单栏 + ToolStrip 工具栏 |
+| Form 命名 | LoginForm, MainForm, ProductForm, OrderForm... | FrmLogin, FrmMain, FrmGoods, FrmOrder... |
+| Model 命名 | Product, Category, Supplier, Order, OrderItem | GoodsInfo, CategoryInfo, SupplierInfo, OrderInfo, OrderItemInfo |
+| BLL 命名 | ProductService, CategoryService, OrderService... | GoodsBiz, CategoryBiz, OrderBiz... |
+| DAL 命名 | ProductDAL, CategoryDAL, OrderDAL... | GoodsDao, CategoryDao, OrderDao... |
 | Common 命名 | PasswordHelper, ValidationHelper | SecurityUtil, ValidateUtil, ExcelUtil |
+| 角色常量 | BusinessConstants.ROLE_ADMIN | RoleConstants.ADMIN |
 
 ### 10.2 数据模型差异
 
-| 维度 | cs-2 | cs-3 |
-|------|------|------|
-| 主键策略 | 字符串主键（手动输入编号） | int 自增主键（系统自动生成） |
-| 售卖模型 | tbl_Sale（单商品单记录） | tbl_Order + tbl_OrderItem（多商品订单） |
-| 商品类别 | 树状层级（parentCategoryID） | 扁平结构 + 类别描述 + 添加时间 |
-| 商品字段 | specification（规格） | origin（产地）+ produceDate（生产日期） |
-| 供货商字段 | contactPerson, phone, address | + legalPerson（法人）+ registerDate（注册日期） |
-| 表数量 | 5 张 | 6 张 |
+| 维度 | cs-2（当前） | cs-3 |
+|------|-------------|------|
+| 主键策略 | 混合策略：User/Category/Supplier/Product 用字符串主键，Order/OrderItem 用 int 自增 | **统一 int 自增主键**（全部表） |
+| 商品类别 | 树状层级（parentCategoryID）+ 类别描述 + 添加时间 | **扁平结构**（无 parentCategoryID）+ 类别描述 + 添加时间 |
+| 商品字段 | specification + origin + productionDate（三者均有） | origin + productionDate（**无 specification**） |
+| 供货商字段 | contactPerson, phone, address, legalPerson, registerDate | 相同（cs-2 已补齐法人/注册日期） |
+| 用户表 | userName(字符串主键), userPassword, userPurview（3 字段） | userID(int 自增主键), loginName, password, realName, role（**5 字段**） |
+| 订单表 | orderID, orderDate, paymentMethod, paymentTime, paymentStatus, receiverName, receiverPhone, receiverAddress, totalAmount（9 字段，无操作员关联） | 增加 **orderNo（可读订单号）** 和 **userID（操作员外键）**（11 字段） |
+| 订单明细 | itemID, orderID, productID, productName, unitPrice, quantity, **totalPrice** | itemID, orderID, productID, productName, unitPrice, quantity, **subtotal**（字段名不同） |
+| 支付状态取值 | "待支付" / "已支付" | "**未支付**" / "已支付"（取值不同） |
+| 表数量 | 6 张 | 6 张（表数量相同，但表结构不同） |
 
 ### 10.3 数据访问层差异
 
-| 维度 | cs-2 | cs-3 |
-|------|------|------|
-| 数据读取方式 | SqlDataReader + HasColumn 辅助 | SqlDataAdapter + DataTable |
-| DAL 基类 | DBConnection（静态连接） | BaseDao（实例化连接，支持事务） |
-| 事务支持 | 无（单条 SQL 执行） | SqlTransaction（订单创建多表事务） |
-| 连接管理 | 全局静态连接 | 每次操作 using 自动释放 |
+| 维度 | cs-2（当前） | cs-3 |
+|------|-------------|------|
+| 数据读取方式 | SqlDataReader + HasColumn 辅助方法 | **SqlDataAdapter + DataTable** 填充模式 |
+| DAL 基类 | DBConnection（静态类，仅提供连接字符串） | **BaseDao（实例类，封装连接+命令+适配器）** |
+| 事务使用 | DeductStock 接受外部 SqlTransaction 参数 | **OrderDao 内部管理事务**（ BeginTransaction/Commit/Rollback） |
+| 连接管理 | 静态连接字符串 + 每次操作 using SqlConnection | BaseDao 封装 using SqlConnection（调用方无需管理连接） |
+| SQL 构建 | 字符串拼接 WHERE 子句 + SqlParameter | **SqlDataAdapter + SelectCommand** 配合参数化 |
 
 ### 10.4 UI 布局差异
 
-| 维度 | cs-2 | cs-3 |
-|------|------|------|
-| 主窗体导航 | Panel + Button 按钮网格 | MenuStrip 菜单栏 + ToolStrip 工具栏 |
-| 列表控件 | DataGridView | DataGridView（列样式不同） |
-| 添加/修改窗体 | 独立窗体弹出 | 独立窗体弹出（布局不同） |
-| 订单界面 | 单商品售卖表单 | 主从表 + 购物车式多商品列表 |
+| 维度 | cs-2（当前） | cs-3 |
+|------|-------------|------|
+| 主窗体导航 | Button 按钮垂直排列（CreateMenuButton 方法） | **MenuStrip 菜单栏 + ToolStrip 工具栏** |
+| 按钮样式 | 蓝色背景 FlatStyle.Flat + 白色文字 | 菜单项 + 工具栏图标按钮 |
+| 列表控件 | DataGridView | DataGridView（**列样式、列头颜色不同**） |
+| 添加/修改窗体 | 独立窗体弹出 | 独立窗体弹出（**布局、控件排列不同**） |
+| 订单界面 | OrderForm（主从表模式） | FrmOrder（**购物车式列表 + 左侧商品选择面板**） |
+| 权限控制 | 按钮 Enabled + 背景色变灰 | **菜单项 Enabled + 可见性控制** |
 
 ---
 
