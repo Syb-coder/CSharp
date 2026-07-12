@@ -159,7 +159,7 @@
       "module_figure": {
         "caption": "图2-1  系统功能模块图",
         "image_path": "c:\\000\\code\\CSharp\\cs-4\\docs\\module_diagram.png",
-        "image_width_cm": 15
+        "image_width_cm": 15.5
       },
       "db_tables": [
         {
