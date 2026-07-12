@@ -1,0 +1,1218 @@
+{
+  "_说明": "cs-4 校园易购信息管理系统 论文配置文件",
+  "_使用方法": "python cs-0/template/generate_thesis.py cs-4/docs/thesis_config.json 输出路径.docx",
+
+  "meta": {
+    "university": "东北石油大学",
+    "university_spaced": "东 北 石 油 大 学",
+    "doc_type": "课  程  设  计",
+    "cover_date": "2026年 7 月25日",
+    "cover_font": "华文行楷",
+    "cover_university_size": 26,
+    "cover_doctype_size": 42,
+    "cover_date_size": 16
+  },
+
+  "page": {
+    "width_cm": 21.0,
+    "height_cm": 29.7,
+    "left_margin_cm": 3.0,
+    "right_margin_cm": 2.5,
+    "top_margin_cm": 3.0,
+    "bottom_margin_cm": 2.5,
+    "header_distance_cm": 1.5,
+    "footer_distance_cm": 1.75
+  },
+
+  "student": {
+    "class_name": "计科25-1班01",
+    "name": "李轩赫",
+    "student_id": "250702940701",
+    "department": "计算机与信息技术学院",
+    "instructor": "王磊",
+    "instructor_title": "讲师",
+    "submit_date": "2026年7月25日"
+  },
+
+  "task_page": {
+    "title": "东北石油大学课程设计任务书",
+    "course": "面向对象课程设计",
+    "subject": "校园易购信息管理系统的开发",
+    "main_content": "本次课程设计主要完成校园易购管理系统的设计与开发。对校园易购管理系统的需求进行任务分解，完成功能模块设计，数据库表结构设计要合理、关系清晰，并最终实现商品类别管理、商品信息管理、供货商管理、商品售卖及其它系统所需的附加信息管理等功能。",
+    "requirements": [
+      "1．该系统开发环境为Microsoft Visual Studio 2022或以上版本，编程语言为C#，后台数据库为SQL Server 2019或以上版本，开发模式为C/S。",
+      "2．完成系统规划与设计过程，实现系统功能的开发，确保系统可顺利运行。",
+      "3．完成课程设计报告撰写工作。"
+    ],
+    "references": [
+      "[1]江红．C#程序设计教程[M]．北京：清华大学出版社，2024．",
+      "[2]明日科技．SQL Server完全自学教程 [M]．北京：人民邮电出版社，2023．",
+      "[3]曹宇，许高峰，王佳丽．C#程序设计与编程案例[M]．北京：清华大学出版社，2022．",
+      "[4]崔祥．基于Web的在线购物系统设计[J]．无线互联科技，2022，19(24)：71-74．"
+    ],
+    "deadline": "18-20周",
+    "task_date": "2026年7月6日"
+  },
+
+  "chapters": {
+    "chapter1": {
+      "title": "第1章 概 述",
+      "sections": [
+        {
+          "heading": "1.1 项目的目的和意义",
+          "paragraphs": [
+            "随着校园信息化的不断推进，高校师生对便捷购物的需求日益增长。传统校园超市和便利店存在排队等候时间长、商品信息不透明、库存管理粗放、供货商档案维护滞后等问题，亟需一套信息化管理系统将商品类别管理、商品信息维护、供货商管理、订单售卖等环节纳入统一平台，实现校园商品管理的规范化、系统化和程序化。",
+            "校园易购信息管理系统的开发旨在提高校园商品管理的信息处理速度和准确性，使商品管理工作规范化、系统化、程序化，避免管理的随意性。通过将业务规则下沉至数据库端（存储过程、触发器、视图、计算列），确保数据一致性和业务规则的强制执行，为校园商业运营提供可靠的信息化支撑。",
+            "从面向对象程序设计的角度来看，本系统的开发具有重要意义。系统采用C/S三层架构（UI/BLL/DAL），通过封装、继承、多态等面向对象特性，将业务逻辑与数据访问分离，提高了代码的可维护性和可扩展性。实体类（Model）封装数据结构，Repository模式封装数据访问，Manager模式封装业务逻辑，体现了单一职责原则和开闭原则。同时，通过存储过程和触发器将部分业务规则下沉至数据库端，使应用层职责更加纯粹，为面向对象设计思维的训练提供了实践平台。"
+          ]
+        },
+        {
+          "heading": "1.2 项目解决方案选型分析",
+          "paragraphs": [
+            "结合课程设计任务要求和团队技术基础，通过查阅课程教材、知网相关课程设计文献，收集了3套桌面管理系统开发备选方案，从上手难度、课程匹配度、任务规范适配性开展对比论证，完成技术选型。",
+            "备选方案分别为JavaSwing、Python+PyQt、C#WinForm组合。JavaSwing需手动编写全部界面代码，环境配置复杂，与C#课程教学内容脱节，数据库JDBC代码冗余，极易出现连接报错。Python+PyQt虽语法简洁，但需额外学习PyQt库，且与面向对象课程设计主线偏离。",
+            "C#WinForm搭配Visual Studio 2022、SQL Server为最优方案。Visual Studio提供完整可视化窗体设计器，文本框、按钮、数据表格等控件均可直接拖拽布局，大幅减少界面编码量。SQL Server与C#同属微软生态，ADO.NET数据访问接口原生支持，连接稳定。此外，SQL Server支持存储过程、视图、触发器、计算列等高级数据库对象，能够将业务逻辑下沉至数据库端，与应用层形成清晰的职责分离。",
+            "综合多维度对比，最终确定开发技术栈：C#语言（.NET 8.0）、Visual Studio 2022、SQL Server 2019、C/S三层架构。本次完整的方案调研、对比与择优流程充分体现软件开发需求存在多种实现路径，技术选型不能单纯追求新颖，而应匹配团队能力与项目约束。"
+          ]
+        },
+        {
+          "heading": "1.3 技术开发基础",
+          "subsections": [
+            {
+              "heading": "1.3.1 面向对象技术",
+              "paragraphs": [
+                "面向对象技术（Object-Oriented Technology）是一种以对象为基础的软件设计与开发方法。对象是现实世界实体的抽象，包含属性（数据）和方法（行为）。面向对象技术的三大核心特征为封装、继承和多态。",
+                "封装将数据和操作数据的方法绑定在一起，隐藏内部实现细节，仅通过公共接口与外部交互。本系统中，实体类如ProductInfo封装商品数据，ProductRepository封装数据访问逻辑，外部调用者无需关心数据库连接和SQL执行的细节。",
+                "继承允许子类复用父类的代码和行为。本系统中BaseRepository作为所有Repository的基类，提供了ExecuteSpDataTable、ExecuteSpNonQuery等通用方法，子类ProductRepository、OrderRepository等继承后只需添加特定业务方法。",
+                "多态使不同类型的对象可以通过统一接口调用。本系统中所有Repository子类均可调用基类的MakeParam方法创建参数，不同实体类均可通过泛型方法ExecuteSpList<T>进行数据映射。"
+              ]
+            },
+            {
+              "heading": "1.3.2 C#开发语言",
+              "paragraphs": [
+                "C#是微软推出的一种面向对象的、运行于.NET Framework/.NET Core之上的高级程序设计语言。C#语法简洁，类型安全，支持泛型、LINQ、异步编程等现代语言特性。本系统使用C# .NET 8.0进行开发，充分利用了其以下特性：",
+                "使用async/await模式处理异步数据库操作，提高UI响应速度；使用LINQ to DataSet对DataTable结果集进行灵活查询和映射；使用泛型方法减少重复代码；使用模式匹配（switch表达式、is模式）简化类型判断逻辑；使用using声明自动管理IDisposable资源（如SqlConnection、SqlCommand），避免资源泄漏。"
+              ]
+            },
+            {
+              "heading": "1.3.3 SQL Server数据库管理系统",
+              "paragraphs": [
+                "SQL Server是微软开发的关系型数据库管理系统，具有高可靠性、高性能和丰富的功能特性。本系统使用SQL Server 2019作为后台数据库，充分利用了其以下高级功能：",
+                "存储过程（Stored Procedure）：预编译的SQL语句集合，存储在数据库中，应用层通过名称调用。本系统定义了15个存储过程，覆盖所有CRUD操作，DAL层只需调用存储过程名称并传递参数，不拼接任何SQL语句，天然防止SQL注入。",
+                "视图（View）：虚拟表，基于一张或多张表的查询结果。本系统定义了3个视图，分别用于商品列表绑定（v_Product_Detail，自动JOIN类别名称和供货商名称）、类别列表绑定（v_Category_List，含商品数量统计）和库存预警（v_LowStock_Product，筛选库存低于20的商品）。",
+                "触发器（Trigger）：在表上执行INSERT/UPDATE/DELETE操作时自动执行的特殊存储过程。本系统定义了2个触发器，tr_OrderItem_Insert在插入订单明细时自动扣减库存并检查库存不足，tr_OrderItem_Delete在删除订单明细时自动回补库存。触发器确保无论通过何种途径插入订单明细，库存都会被正确扣减。",
+                "计算列（Computed Column）：值由表达式自动计算的列，PERSISTED表示物理存储。本系统定义了3个计算列：displayNo（商品可读编号，格式SP00001）、amount（订单明细小计金额，等于单价乘以数量）、totalAmount（订单总金额，由触发器维护）。"
+              ]
+            },
+            {
+              "heading": "1.3.4 Client/Server开发模式与三层架构",
+              "paragraphs": [
+                "Client/Server开发模式又称客户/服务器模式。服务器通常采用高性能的PC或工作站，并采用大型数据库系统如SQL Server。客户端需要安装专用的客户端软件。C/S结构的优点是能充分发挥客户端PC的处理能力，很多工作可以在客户端处理后，客户端响应速度快。",
+                "本系统采用三层架构（Three-Tier Architecture），将应用程序分为三个逻辑层：表示层（UI）、业务逻辑层（BLL）和数据访问层（DAL）。三层架构的作用在于分离关注点，降低层间耦合，提高代码的可维护性和可测试性。",
+                "表示层（UI）负责用户界面展示和交互，包括9个WinForms窗体（FrmLogin、FrmMain、FrmCategory、FrmProduct、FrmSupplier、FrmOrder、FrmUser、FrmChangePassword、FrmLowStock），不包含任何业务逻辑和数据库访问代码。",
+                "业务逻辑层（BLL）负责业务规则校验和业务流程编排，包括5个Manager类（UserManager、CategoryManager、ProductManager、SupplierManager、OrderManager）和1个自定义异常类（BusinessException）。BLL层调用DAL层进行数据操作，在调用前执行输入校验，在调用后处理业务规则。",
+                "数据访问层（DAL）负责与数据库交互，包括1个基类（BaseRepository）和5个Repository子类（UserRepository、CategoryRepository、ProductRepository、SupplierRepository、OrderRepository）。DAL层所有操作通过存储过程调用（CommandType=StoredProcedure），不拼接任何SQL语句，查询操作通过视图绑定。",
+                "此外，系统还包含公共层（Common），提供安全工具类（SecurityUtil，SHA-256密码哈希）、UI工具类（UiHelper，Label宽度测量、DataGridView样式、异常处理）和校验工具类（ValidateUtil，长度校验、格式校验）。"
+              ]
+            }
+          ]
+        },
+        {
+          "heading": "1.4 系统基本功能",
+          "paragraphs": [
+            "在以上技术环境下对校园易购信息管理系统进行开发与设计。系统主要实现以下功能：",
+            "1．登录模块：用户输入用户名、密码并选择身份（管理员/店员），系统通过存储过程sp_User_Validate验证账号密码与身份是否匹配。验证通过后进入主窗体并将登录信息传递至标题栏显示；验证失败则弹出错误提示并清空密码框等待重新输入。",
+            "2．商品类别管理：管理员可对商品类别执行增、删、改、查操作。商品类别采用扁平结构加排序号设计，每个类别包含描述信息和添加时间。删除前系统通过存储过程检查是否存在关联商品。",
+            "3．商品信息管理：管理员可对商品信息执行增、删、改、查操作。添加商品时需选择商品类别和供货商，商品列表通过视图v_Product_Detail绑定，自动关联显示类别名称和供货商名称。商品编号采用INT自增主键加displayNo可读编号列的双重设计。",
+            "4．供货商管理：管理员可对供货商档案执行增、删、改、查操作，包括供货商名称、法人代表、注册日期、联系人、联系电话和地址等信息。删除前系统检查该供货商下是否有关联商品。",
+            "5．订单管理：用户通过购物车模式创建订单，选择商品加入购物车，填写收货信息，选择支付方式后提交。系统通过存储过程sp_Order_Create在同一事务中插入订单主表和明细表，库存扣减由tr_OrderItem_Insert触发器自动完成。管理员可对未结款订单执行确认结款操作。",
+            "6．用户管理：管理员可对系统用户执行增、删、改操作，用户分为管理员和店员两种权限。所有用户均可修改自身密码。",
+            "7．库存预警：管理员可查看库存低于预警阈值的商品列表，通过视图v_LowStock_Product获取数据，列表按库存量升序排列。"
+          ]
+        }
+      ]
+    },
+
+    "chapter2": {
+      "title": "第2章 系统设计",
+      "intro": "根据前面的分析，校园易购信息管理系统数据库（CampusStore）中包括系统用户表\"tbl_User\"、商品类别表\"tbl_Category\"、供货商信息表\"tbl_Supplier\"、商品信息表\"tbl_Product\"、订单主表\"tbl_Order\"和订单商品明细表\"tbl_OrderItem\"六个表。此外，数据库还包含15个存储过程、3个视图、2个触发器和3个计算列，形成存储过程+视图+触发器+计算列驱动的数据库端逻辑架构。",
+      "modules": [
+        "校园易购信息管理系统是校园信息化建设中不可缺少的一个子系统，它涉及到商品类别、商品信息、供货商、订单等数据的综合管理。校园易购信息管理系统包括以下八个模块：",
+        "1．登录模块",
+        "登录模块提供用户登录界面，用户输入用户名、密码并选择身份（管理员/店员）后，系统通过存储过程sp_User_Validate验证身份。验证通过则进入系统主窗体；否则弹出错误提示并清空密码框等待重新输入。",
+        "2．主窗体导航模块",
+        "主窗体作为系统导航中枢，根据用户权限动态启用或禁用功能按钮。管理员可操作全部功能；店员可使用查询类功能、创建订单和库存预警查看。",
+        "3．商品类别管理模块",
+        "商品类别管理模块用于管理商品类别信息，包括类别名称、类别描述、排序号和添加时间，能对类别信息进行添加、删除、修改和查询操作。删除时系统检查是否存在关联商品。",
+        "4．商品信息管理模块",
+        "商品信息管理模块用于管理商品详细信息，包括商品名称、类别、单价、产地、生产日期、库存数量和供货商。商品列表通过视图v_Product_Detail绑定，自动关联显示类别名称和供货商名称。能对商品信息进行添加、删除、修改和查询操作。",
+        "5．供货商管理模块",
+        "供货商管理模块用于管理供货商档案信息，包括供货商名称、法人代表、注册日期、联系人、联系电话和地址。能对供货商信息进行添加、删除、修改和查询操作。",
+        "6．订单管理模块",
+        "订单管理模块用于管理商品售卖信息，支持购物车模式下单。用户选择商品加入购物车，填写收货信息后提交订单。系统通过存储过程sp_Order_Create在同一事务中插入订单主表和明细表，库存扣减由tr_OrderItem_Insert触发器自动完成。管理员可对未结款订单执行确认结款操作。",
+        "7．用户管理模块",
+        "用户管理模块用于管理系统用户，由管理员进行操作。可以添加、删除、修改用户数据。用户分为管理员和店员两种权限，管理员可以操作全部功能，店员可以查询商品、创建订单和查看库存预警。",
+        "8．库存预警模块",
+        "库存预警模块用于展示库存低于预警阈值（默认20件）的商品列表，通过视图v_LowStock_Product获取数据，帮助管理员及时发现缺货风险。",
+        "校园易购信息管理系统功能模块图如图2-1所示。"
+      ],
+      "module_figure": {
+        "caption": "图2-1  系统功能模块图",
+        "image_path": "c:\\000\\code\\CSharp\\cs-4\\docs\\module_diagram.png",
+        "image_width_cm": 15
+      },
+      "db_tables": [
+        {
+          "title": "表2-1 系统用户表",
+          "intro": "系统用户表\"tbl_User\"用于存放系统用户（管理员/店员）的相关数据，包括登录名、密码哈希值和角色信息，其结构如表2-1所示。密码采用SHA-256算法哈希后存储，确保安全性。",
+          "label": "1．系统用户表",
+          "headers": ["列名", "说明", "数据类型", "约束"],
+          "rows": [
+            ["userID", "用户编号", "INT", "主键，自增"],
+            ["loginName", "登录名", "NVARCHAR(20)", "非空，唯一"],
+            ["password", "密码哈希", "NVARCHAR(64)", "非空（SHA-256）"],
+            ["role", "权限", "NVARCHAR(10)", "非空，CHECK(管理员/店员)"]
+          ],
+          "col_widths": [2130, 1398, 1980, 3014],
+          "border_h_sz": "2"
+        },
+        {
+          "title": "表2-2 商品类别表",
+          "intro": "商品类别表\"tbl_Category\"用于存放商品类别信息，采用扁平结构加排序号设计，包括类别名称、类别描述、添加时间和排序号，其结构如表2-2所示。",
+          "label": "2．商品类别表",
+          "headers": ["列名", "说明", "数据类型", "约束"],
+          "rows": [
+            ["categoryID", "类别编号", "INT", "主键，自增"],
+            ["categoryName", "类别名称", "NVARCHAR(20)", "非空"],
+            ["categoryDesc", "类别描述", "NVARCHAR(100)", "可为空"],
+            ["addTime", "添加时间", "DATETIME", "非空，默认GETDATE()"],
+            ["sortOrder", "排序号", "INT", "默认0"]
+          ],
+          "col_widths": [2130, 2130, 2131, 2131],
+          "border_h_sz": "6"
+        },
+        {
+          "title": "表2-3 供货商信息表",
+          "intro": "供货商信息表\"tbl_Supplier\"用于存放供货商档案信息，包括供货商名称、法人代表、注册日期、联系人、联系电话和地址，其结构如表2-3所示。",
+          "label": "3．供货商信息表",
+          "headers": ["列名", "说明", "数据类型", "约束"],
+          "rows": [
+            ["supplierID", "供货商编号", "INT", "主键，自增"],
+            ["supplierName", "供货商名称", "NVARCHAR(50)", "非空"],
+            ["legalPerson", "法人代表", "NVARCHAR(20)", "可为空"],
+            ["registerDate", "注册日期", "DATE", "可为空"],
+            ["contactPerson", "联系人", "NVARCHAR(20)", "可为空"],
+            ["phone", "联系电话", "NVARCHAR(15)", "可为空"],
+            ["address", "地址", "NVARCHAR(100)", "可为空"]
+          ],
+          "col_widths": [2130, 2130, 2131, 2131],
+          "border_h_sz": "6",
+          "continued_title": "续表2-3",
+          "continued_rows": []
+        },
+        {
+          "title": "表2-4 商品信息表",
+          "intro": "商品信息表\"tbl_Product\"用于存放商品详细信息。其中displayNo为PERSISTED计算列，格式为'SP'+RIGHT('00000'+CAST(productID),5)，自动生成如SP00001的可读编号。其结构如表2-4所示。",
+          "label": "4．商品信息表",
+          "headers": ["列名", "说明", "数据类型", "约束"],
+          "rows": [
+            ["productID", "商品编号", "INT", "主键，自增"],
+            ["displayNo", "可读编号", "计算列(PERSISTED)", "'SP'+RIGHT('00000'+CAST(productID),5)"],
+            ["productName", "商品名称", "NVARCHAR(50)", "非空"],
+            ["categoryID", "类别编号", "INT", "外键，引用tbl_Category"],
+            ["unitPrice", "单价", "DECIMAL(10,2)", "非空，CHECK>0"],
+            ["origin", "产地", "NVARCHAR(50)", "可为空"],
+            ["produceDate", "生产日期", "DATE", "可为空"],
+            ["stockQuantity", "库存数量", "INT", "非空，CHECK>=0"],
+            ["supplierID", "供货商编号", "INT", "外键，引用tbl_Supplier"]
+          ],
+          "col_widths": [2130, 2130, 2131, 2131],
+          "border_h_sz": "6"
+        },
+        {
+          "title": "表2-5 订单主表",
+          "intro": "订单主表\"tbl_Order\"用于存放订单基本信息。totalAmount字段由触发器tr_OrderItem_Insert/Delete维护，等于该订单所有明细amount之和。其结构如表2-5所示。",
+          "label": "5．订单主表",
+          "headers": ["列名", "说明", "数据类型", "约束"],
+          "rows": [
+            ["orderID", "订单编号", "INT", "主键，自增"],
+            ["orderDate", "下单日期", "DATETIME", "非空，默认GETDATE()"],
+            ["paymentMethod", "支付方式", "NVARCHAR(10)", "可为空（现金/微信/支付宝）"],
+            ["paymentTime", "结款时间", "DATETIME", "可为空（未结款为NULL）"],
+            ["paymentStatus", "结款状态", "NVARCHAR(10)", "非空，默认'未结款'，CHECK(未结款/已结款)"],
+            ["receiverName", "收货人姓名", "NVARCHAR(20)", "可为空"],
+            ["receiverPhone", "收货人手机号", "NVARCHAR(15)", "可为空"],
+            ["receiverAddress", "收货地址", "NVARCHAR(200)", "可为空"],
+            ["totalAmount", "订单总金额", "DECIMAL(10,2)", "非空，默认0，触发器维护"]
+          ],
+          "col_widths": [2130, 2130, 2131, 2131],
+          "border_h_sz": "6"
+        },
+        {
+          "title": "表2-6 订单商品明细表",
+          "intro": "订单商品明细表\"tbl_OrderItem\"用于存放订单中的商品明细信息。amount为PERSISTED计算列，等于unitPrice乘以quantity，由数据库引擎自动维护。其结构如表2-6所示。",
+          "label": "6．订单商品明细表",
+          "headers": ["列名", "说明", "数据类型", "约束"],
+          "rows": [
+            ["itemID", "明细编号", "INT", "主键，自增"],
+            ["orderID", "订单编号", "INT", "外键，引用tbl_Order"],
+            ["productID", "商品编号", "INT", "外键，引用tbl_Product"],
+            ["productName", "商品名称", "NVARCHAR(50)", "非空（下单时快照值）"],
+            ["unitPrice", "单价", "DECIMAL(10,2)", "非空（下单时快照值）"],
+            ["quantity", "购买数量", "INT", "非空，CHECK>0"],
+            ["amount", "小计金额", "计算列(PERSISTED)", "=unitPrice*quantity"]
+          ],
+          "col_widths": [2130, 2130, 2131, 2131],
+          "border_h_sz": "6"
+        }
+      ]
+    },
+
+    "chapter3": {
+      "title": "第3章 系统的详细设计及实现",
+      "sections": [
+        {
+          "heading": "3.1 公共类设计",
+          "paragraphs": [
+            "考虑到系统的各个模块都需要访问数据库、校验输入、处理异常和创建UI控件，本系统在开发时编写了若干公共类，封装通用功能，提高代码复用率。主要包括BaseRepository（数据访问基类）、SecurityUtil（安全工具类）、UiHelper（UI工具类）和ValidateUtil（校验工具类）。"
+          ],
+          "subsections": [
+            {
+              "heading": "3.1.1 数据访问基类 BaseRepository",
+              "paragraphs": [
+                "BaseRepository是所有Repository的抽象基类，封装了存储过程调用和视图查询的通用方法。子类只需调用基类方法并传递存储过程名称和参数，无需重复编写连接管理和命令执行的代码。基类提供以下核心方法：",
+                "ExecuteSpDataTable：执行存储过程查询，返回DataTable结果集；ExecuteSpNonQuery：执行存储过程非查询操作，返回受影响行数；ExecuteSpScalar：执行存储过程，返回首行首列值；ExecuteSpList<T>：执行存储过程并通过回调函数映射为实体列表；ExecuteViewDataTable：执行视图查询，支持参数化WHERE子句。"
+              ],
+              "code_blocks": [
+                {
+                  "title": "BaseRepository 核心方法",
+                  "desc": "基类封装的存储过程调用与视图查询方法，子类通过继承直接使用。",
+                  "segments": [
+                    {
+                      "label": "DAL层 - BaseRepository.cs",
+                      "lines": [
+                        "public abstract class BaseRepository",
+                        "{",
+                        "    protected static readonly string ConnectionString;",
+                        "",
+                        "    static BaseRepository()",
+                        "    {",
+                        "        ConnectionString = ConfigurationManager.ConnectionStrings[\"CampusStore\"]",
+                        "            ?.ConnectionString",
+                        "            ?? throw new InvalidOperationException(\"未找到连接字符串\");",
+                        "    }",
+                        "",
+                        "    // 执行存储过程查询，返回DataTable",
+                        "    protected static DataTable ExecuteSpDataTable(string spName,",
+                        "        params SqlParameter[] parameters)",
+                        "    {",
+                        "        DataTable table = new();",
+                        "        using SqlDataAdapter adapter = new(spName, ConnectionString)",
+                        "        {",
+                        "            SelectCommand = { CommandType = CommandType.StoredProcedure }",
+                        "        };",
+                        "        if (parameters != null && parameters.Length > 0)",
+                        "            adapter.SelectCommand.Parameters.AddRange(parameters);",
+                        "        adapter.Fill(table);",
+                        "        return table;",
+                        "    }",
+                        "",
+                        "    // 执行存储过程，返回首行首列值",
+                        "    protected static object ExecuteSpScalar(string spName,",
+                        "        params SqlParameter[] parameters)",
+                        "    {",
+                        "        using SqlConnection conn = new(ConnectionString);",
+                        "        using SqlCommand cmd = new(spName, conn)",
+                        "        { CommandType = CommandType.StoredProcedure };",
+                        "        if (parameters != null && parameters.Length > 0)",
+                        "            cmd.Parameters.AddRange(parameters);",
+                        "        conn.Open();",
+                        "        return cmd.ExecuteScalar();",
+                        "    }",
+                        "",
+                        "    // 执行视图查询（参数化WHERE子句）",
+                        "    protected static DataTable ExecuteViewDataTable(string viewName,",
+                        "        string whereClause = null, params SqlParameter[] parameters)",
+                        "    {",
+                        "        DataTable table = new();",
+                        "        string sql = string.IsNullOrWhiteSpace(whereClause)",
+                        "            ? $\"SELECT * FROM {viewName}\"",
+                        "            : $\"SELECT * FROM {viewName} WHERE {whereClause}\";",
+                        "        using SqlDataAdapter adapter = new(sql, ConnectionString);",
+                        "        if (parameters != null && parameters.Length > 0)",
+                        "            adapter.SelectCommand.Parameters.AddRange(parameters);",
+                        "        adapter.Fill(table);",
+                        "        return table;",
+                        "    }",
+                        "}"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "heading": "3.1.2 安全工具类 SecurityUtil",
+              "paragraphs": [
+                "SecurityUtil类封装了密码的SHA-256哈希计算和验证功能。密码明文在应用层通过SHA256.HashData方法计算哈希值后，以64位小写十六进制字符串形式传入存储过程，数据库中不存储明文密码。"
+              ],
+              "code_blocks": [
+                {
+                  "title": "SecurityUtil 密码哈希",
+                  "desc": "使用SHA-256算法对密码进行哈希，返回64位十六进制字符串。",
+                  "segments": [
+                    {
+                      "label": "Common层 - SecurityUtil.cs",
+                      "lines": [
+                        "public static class SecurityUtil",
+                        "{",
+                        "    public static string Sha256Hash(string input)",
+                        "    {",
+                        "        if (input == null)",
+                        "            throw new ArgumentNullException(nameof(input));",
+                        "        byte[] bytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));",
+                        "        return Convert.ToHexString(bytes).ToLowerInvariant();",
+                        "    }",
+                        "",
+                        "    public static bool VerifyPassword(string plainPassword, string hashValue)",
+                        "    {",
+                        "        if (string.IsNullOrEmpty(plainPassword) || string.IsNullOrEmpty(hashValue))",
+                        "            return false;",
+                        "        return string.Equals(Sha256Hash(plainPassword), hashValue,",
+                        "            StringComparison.OrdinalIgnoreCase);",
+                        "    }",
+                        "}"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "heading": "3.1.3 UI工具类 UiHelper",
+              "paragraphs": [
+                "UiHelper类封装了WinForms通用操作，包括Label宽度测量后固定（避免文字被遮挡）、统一异常处理（区分BusinessException业务异常与系统异常）、DataGridView样式设置和删除确认对话框等。其中CreateLabel方法先用AutoSize测量文字真实宽度，再固定为实际渲染值，彻底解决了Label文字被TextBox遮挡的问题。"
+              ],
+              "code_blocks": [
+                {
+                  "title": "UiHelper 核心方法",
+                  "desc": "Label宽度测量与固定、统一异常处理。",
+                  "segments": [
+                    {
+                      "label": "Common层 - UiHelper.cs",
+                      "lines": [
+                        "public static class UiHelper",
+                        "{",
+                        "    // 创建固定宽度Label，宽度根据文字内容自动测量",
+                        "    public static Label CreateLabel(string text, int x, int y)",
+                        "    {",
+                        "        Label lbl = new()",
+                        "        {",
+                        "            Text = text,",
+                        "            Font = new Font(\"Microsoft YaHei UI\", 9F),",
+                        "            AutoSize = true,",
+                        "            Location = new Point(x, y),",
+                        "            TextAlign = ContentAlignment.MiddleLeft,",
+                        "            BackColor = Color.Transparent",
+                        "        };",
+                        "        using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))",
+                        "        {",
+                        "            SizeF measured = g.MeasureString(text, lbl.Font);",
+                        "            lbl.AutoSize = false;",
+                        "            lbl.Size = new Size((int)measured.Width + 2, 20);",
+                        "        }",
+                        "        return lbl;",
+                        "    }",
+                        "",
+                        "    // 统一异常处理",
+                        "    public static void HandleException(Exception ex, IWin32Window owner = null)",
+                        "    {",
+                        "        if (ex is BusinessException bizEx)",
+                        "            MessageBox.Show(owner, bizEx.Message, \"提示\",",
+                        "                MessageBoxButtons.OK, MessageBoxIcon.Information);",
+                        "        else",
+                        "            MessageBox.Show(owner, $\"系统错误：{ex.Message}\", \"系统错误\",",
+                        "                MessageBoxButtons.OK, MessageBoxIcon.Error);",
+                        "    }",
+                        "}"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "heading": "3.2 系统登录",
+          "paragraphs": [
+            "登录是系统中不可缺少的模块，好的登录模块可以保证系统的可靠性和安全性。本系统的登录模块提供用户名、密码输入和身份选择（管理员/店员）功能，通过存储过程sp_User_Validate验证身份。"
+          ],
+          "subsections": [
+            {
+              "heading": "3.2.1 登录界面设计",
+              "paragraphs": [
+                "使用Label、TextBox、ComboBox、Button控件设计登录界面。用户输入用户名和密码后，从下拉框选择身份，点击登录按钮进行验证。登录界面如图3-1所示。"
+              ],
+              "figure": {
+                "caption": "图3-1 登录界面",
+                "placeholder_lines": 4
+              }
+            },
+            {
+              "heading": "3.2.2 登录编码实现",
+              "paragraphs": [
+                "登录按钮点击事件中，首先使用卫语句校验用户名、密码和身份不能为空，然后调用UserManager.Login方法进行身份验证。Login方法内部通过SecurityUtil计算密码SHA-256哈希后，调用UserRepository.Validate执行存储过程sp_User_Validate。验证通过则隐藏登录窗体并显示主窗体；验证失败则弹出提示并清空密码框。"
+              ],
+              "code_blocks": [
+                {
+                  "title": "1. 登录验证",
+                  "desc": "UI层读取输入并调用BLL层验证身份，BLL层计算密码哈希后调用DAL层存储过程。",
+                  "segments": [
+                    {
+                      "label": "UI层 - FrmLogin.cs",
+                      "lines": [
+                        "private void BtnLogin_Click(object sender, EventArgs e)",
+                        "{",
+                        "    try",
+                        "    {",
+                        "        string loginName = txtUserName.Text.Trim();",
+                        "        string password = txtPassword.Text;",
+                        "        string role = cmbRole.SelectedItem?.ToString();",
+                        "",
+                        "        if (string.IsNullOrWhiteSpace(loginName) || string.IsNullOrWhiteSpace(password))",
+                        "        {",
+                        "            MessageBox.Show(\"请输入用户名和密码\", \"提示\");",
+                        "            txtPassword.Focus();",
+                        "            return;",
+                        "        }",
+                        "",
+                        "        UserInfo user = new UserManager().Login(loginName, password, role);",
+                        "        if (user == null)",
+                        "        {",
+                        "            MessageBox.Show(\"用户名或密码错误，或身份不匹配\", \"登录失败\");",
+                        "            txtPassword.Clear();",
+                        "            txtPassword.Focus();",
+                        "            return;",
+                        "        }",
+                        "",
+                        "        _loginSucceeded = true;",
+                        "        this.Hide();",
+                        "        new FrmMain(user).Show();",
+                        "    }",
+                        "    catch (Exception ex) { UiHelper.HandleException(ex, this); }",
+                        "}"
+                      ]
+                    },
+                    {
+                      "label": "BLL层 - UserManager.cs",
+                      "lines": [
+                        "public UserInfo Login(string loginName, string password, string role)",
+                        "{",
+                        "    // 密码明文在BLL层计算SHA-256哈希后传入DAL",
+                        "    string hash = SecurityUtil.Sha256Hash(password);",
+                        "    return _repo.Validate(loginName, hash, role);",
+                        "}"
+                      ]
+                    },
+                    {
+                      "label": "DAL层 - UserRepository.cs",
+                      "lines": [
+                        "public UserInfo Validate(string loginName, string password, string role)",
+                        "{",
+                        "    DataTable dt = ExecuteSpDataTable(\"sp_User_Validate\",",
+                        "        MakeParam(\"@loginName\", loginName),",
+                        "        MakeParam(\"@password\", password),",
+                        "        MakeParam(\"@role\", role));",
+                        "    if (dt.Rows.Count == 0) return null;",
+                        "    DataRow row = dt.Rows[0];",
+                        "    return new UserInfo",
+                        "    {",
+                        "        UserID = row.Field<int>(\"userID\"),",
+                        "        LoginName = row.Field<string>(\"loginName\"),",
+                        "        Role = row.Field<string>(\"role\")",
+                        "    };",
+                        "}"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "heading": "3.3 主窗体",
+          "paragraphs": [
+            "主窗体是用户进入各子系统的入口，登录成功后加载。窗体标题栏显示当前登录用户名和身份信息，根据用户权限动态设置各功能按钮的Enabled状态。管理员可操作全部功能；店员的商品类别管理和用户管理按钮被禁用。用户点击功能按钮后以对话框方式显示对应子窗体，关闭后自动释放资源。"
+          ],
+          "subsections": [
+            {
+              "heading": "3.3.1 主窗体界面设计",
+              "paragraphs": [
+                "主窗体采用2行3列的按钮布局，包含商品类别管理、商品信息管理、供货商管理、订单管理、用户管理、库存预警六个功能按钮，底部设有修改密码和退出登录按钮。主窗体界面如图3-2所示。"
+              ],
+              "figure": {
+                "caption": "图3-2 主窗体界面",
+                "placeholder_lines": 4
+              }
+            },
+            {
+              "heading": "3.3.2 主窗体编码实现",
+              "paragraphs": [
+                "主窗体在构造函数中接收当前登录用户对象，调用ApplyPermission方法根据角色设置按钮权限。功能按钮通过ShowDialog方法以对话框方式显示子窗体，确保同时只能打开一个子窗体。"
+              ],
+              "code_blocks": [
+                {
+                  "title": "主窗体权限控制与导航",
+                  "desc": "根据登录用户角色动态设置按钮权限，点击按钮打开对应子窗体。",
+                  "segments": [
+                    {
+                      "label": "UI层 - FrmMain.cs",
+                      "lines": [
+                        "public FrmMain(UserInfo user)",
+                        "{",
+                        "    _currentUser = user ?? throw new ArgumentNullException(nameof(user));",
+                        "    InitializeComponent();",
+                        "    BindEvents();",
+                        "    ApplyPermission();",
+                        "}",
+                        "",
+                        "// 权限控制：店员禁用商品类别管理与用户管理",
+                        "private void ApplyPermission()",
+                        "{",
+                        "    if (_currentUser.Role == \"店员\")",
+                        "    {",
+                        "        btnCategory.Enabled = false;",
+                        "        btnUser.Enabled = false;",
+                        "    }",
+                        "}",
+                        "",
+                        "// 以对话框方式显示子窗体，关闭后自动释放资源",
+                        "private void ShowDialog(Form childForm)",
+                        "{",
+                        "    using (childForm) { childForm.ShowDialog(this); }",
+                        "}"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "heading": "3.4 商品信息管理",
+          "paragraphs": [
+            "商品信息管理模块用于管理商品的详细信息，包括商品名称、类别、单价、产地、生产日期、库存数量和供货商。管理员可执行添加、删除、修改和查询操作。商品列表通过视图v_Product_Detail绑定，自动关联显示类别名称和供货商名称，无需应用层JOIN。"
+          ],
+          "subsections": [
+            {
+              "heading": "3.4.1 界面设计",
+              "paragraphs": [
+                "商品信息管理界面分为查询区、数据网格区和编辑区三部分。查询区提供商品名称、类别和供货商三个组合查询条件；数据网格区展示商品列表，包含可读编号、商品名称、类别名称、单价、产地、生产日期、库存和供货商名称；编辑区提供商品信息的录入和修改控件。界面如图3-3所示。"
+              ],
+              "figure": {
+                "caption": "图3-3 商品信息管理界面",
+                "placeholder_lines": 4
+              }
+            },
+            {
+              "heading": "3.4.2 编码实现",
+              "paragraphs": [
+                "商品信息管理的增删改查操作均通过三层架构调用：UI层读取输入并构建ProductInfo对象，BLL层执行业务校验后调用DAL层，DAL层通过存储过程操作数据库。"
+              ],
+              "code_blocks": [
+                {
+                  "title": "1. 添加功能",
+                  "desc": "UI层构建商品对象，BLL层校验字段后调用存储过程sp_Product_Add。",
+                  "segments": [
+                    {
+                      "label": "UI层 - FrmProduct.cs",
+                      "lines": [
+                        "private void BtnAdd_Click(object sender, EventArgs e)",
+                        "{",
+                        "    try",
+                        "    {",
+                        "        ProductInfo info = BuildProductFromEditArea();",
+                        "        _productManager.Add(info);",
+                        "        BindGrid();",
+                        "        ClearEditArea();",
+                        "        MessageBox.Show(\"添加成功\", \"提示\");",
+                        "    }",
+                        "    catch (Exception ex) { UiHelper.HandleException(ex, this); }",
+                        "}"
+                      ]
+                    },
+                    {
+                      "label": "BLL层 - ProductManager.cs",
+                      "lines": [
+                        "public int Add(ProductInfo info)",
+                        "{",
+                        "    ValidateProduct(info);  // 字段校验",
+                        "    return _repo.Add(info); // 调用DAL层",
+                        "}",
+                        "",
+                        "private static void ValidateProduct(ProductInfo info)",
+                        "{",
+                        "    if (ValidateUtil.IsNullOrWhiteSpace(info.ProductName))",
+                        "        throw new BusinessException(\"请输入商品名称\");",
+                        "    if (info.CategoryID <= 0)",
+                        "        throw new BusinessException(\"请选择商品类别\");",
+                        "    if (!ValidateUtil.IsGreaterThanZero(info.UnitPrice))",
+                        "        throw new BusinessException(\"单价必须大于0\");",
+                        "}"
+                      ]
+                    },
+                    {
+                      "label": "DAL层 - ProductRepository.cs",
+                      "lines": [
+                        "public int Add(ProductInfo info)",
+                        "{",
+                        "    object result = ExecuteSpScalar(\"sp_Product_Add\",",
+                        "        MakeParam(\"@productName\", info.ProductName),",
+                        "        MakeParam(\"@categoryID\", info.CategoryID),",
+                        "        MakeParam(\"@unitPrice\", info.UnitPrice),",
+                        "        MakeParam(\"@origin\", info.Origin),",
+                        "        MakeParam(\"@produceDate\", info.ProduceDate),",
+                        "        MakeParam(\"@stockQty\", info.StockQuantity),",
+                        "        MakeParam(\"@supplierID\", info.SupplierID));",
+                        "    return Convert.ToInt32(result);",
+                        "}"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "2. 查询功能",
+                  "desc": "通过视图v_Product_Detail查询商品列表，支持按商品名称、类别、供货商组合条件检索。",
+                  "segments": [
+                    {
+                      "label": "DAL层 - ProductRepository.cs",
+                      "lines": [
+                        "// 查询全部商品（通过视图v_Product_Detail，自动JOIN类别和供货商名称）",
+                        "public DataTable GetAll()",
+                        "{",
+                        "    return ExecuteViewDataTable(\"v_Product_Detail\");",
+                        "}",
+                        "",
+                        "// 按商品名称、类别、供货商组合条件检索",
+                        "public DataTable Search(string productName, int? categoryID, int? supplierID)",
+                        "{",
+                        "    List<string> conditions = new();",
+                        "    List<SqlParameter> parameters = new();",
+                        "    if (!string.IsNullOrWhiteSpace(productName))",
+                        "    {",
+                        "        conditions.Add(\"productName LIKE @productName\");",
+                        "        parameters.Add(MakeParam(\"@productName\", $\"%{productName}%\"));",
+                        "    }",
+                        "    if (categoryID.HasValue)",
+                        "    {",
+                        "        conditions.Add(\"categoryID = @categoryID\");",
+                        "        parameters.Add(MakeParam(\"@categoryID\", categoryID.Value));",
+                        "    }",
+                        "    if (supplierID.HasValue)",
+                        "    {",
+                        "        conditions.Add(\"supplierID = @supplierID\");",
+                        "        parameters.Add(MakeParam(\"@supplierID\", supplierID.Value));",
+                        "    }",
+                        "    string whereClause = conditions.Count > 0",
+                        "        ? string.Join(\" AND \", conditions) : null;",
+                        "    return ExecuteViewDataTable(\"v_Product_Detail\", whereClause, parameters.ToArray());",
+                        "}"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "3. 修改功能",
+                  "desc": "选中商品后修改信息，调用存储过程sp_Product_Update更新记录。",
+                  "segments": [
+                    {
+                      "label": "BLL层 - ProductManager.cs",
+                      "lines": [
+                        "public int Update(ProductInfo info)",
+                        "{",
+                        "    if (info.ProductID <= 0)",
+                        "        throw new BusinessException(\"请选择要修改的商品\");",
+                        "    ValidateProduct(info);",
+                        "    return _repo.Update(info);",
+                        "}"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "4. 删除功能",
+                  "desc": "删除前通过存储过程sp_Product_Delete检查是否存在订单明细记录。",
+                  "segments": [
+                    {
+                      "label": "BLL层 - ProductManager.cs",
+                      "lines": [
+                        "public int Delete(int productID)",
+                        "{",
+                        "    if (productID <= 0)",
+                        "        throw new BusinessException(\"请选择要删除的商品\");",
+                        "    int result = _repo.Delete(productID);",
+                        "    if (result == 0)",
+                        "        throw new BusinessException(\"存在订单明细记录，无法删除\");",
+                        "    return result;",
+                        "}"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "heading": "3.5 供货商管理",
+          "paragraphs": [
+            "供货商管理模块用于管理供货商档案信息，包括供货商名称、法人代表、注册日期、联系人、联系电话和地址。管理员可执行添加、删除、修改和查询操作。删除前系统通过存储过程sp_Supplier_Delete检查该供货商下是否有关联商品，有则提示无法删除。其界面设计与编码实现与商品信息管理模块类似，此处不再赘述。"
+          ],
+          "subsections": [
+            {
+              "heading": "3.5.1 界面设计",
+              "paragraphs": [
+                "供货商管理界面采用与商品管理类似的布局，包含查询区、数据网格区和编辑区。界面如图3-4所示。"
+              ],
+              "figure": {
+                "caption": "图3-4 供货商管理界面",
+                "placeholder_lines": 4
+              }
+            },
+            {
+              "heading": "3.5.2 编码实现",
+              "paragraphs": [
+                "供货商管理的增删改查操作通过SupplierManager调用SupplierRepository执行存储过程sp_Supplier_Add/Update/Delete，代码结构与商品管理一致。"
+              ]
+            }
+          ]
+        },
+        {
+          "heading": "3.6 订单管理",
+          "paragraphs": [
+            "订单管理模块是本系统的核心模块，采用购物车模式实现商品售卖。用户选择商品并指定数量后加入购物车，可添加多个不同商品。填写收货信息并选择支付方式后提交订单，系统通过存储过程sp_Order_Create在同一事务中插入订单主表和明细表，库存扣减由tr_OrderItem_Insert触发器自动完成。"
+          ],
+          "subsections": [
+            {
+              "heading": "3.6.1 界面设计",
+              "paragraphs": [
+                "订单管理界面分为左右两区。左区为订单列表查询区，支持按收货人名称和结款状态检索，提供查看明细和确认结款功能；右区包含订单明细展示和创建订单功能，创建订单区设有商品选择、购物车网格、收货信息录入和支付信息选择。界面如图3-5所示。"
+              ],
+              "figure": {
+                "caption": "图3-5 订单管理界面",
+                "placeholder_lines": 4
+              }
+            },
+            {
+              "heading": "3.6.2 编码实现",
+              "paragraphs": [
+                "订单创建是本系统最核心的业务流程。UI层将购物车中的商品列表和收货信息构建为OrderInfo对象，BLL层校验后调用DAL层。DAL层通过Table-Valued Parameter将商品明细列表一次性传递给存储过程sp_Order_Create，存储过程内部开启事务，逐条插入订单明细（触发器自动扣减库存），最后返回订单ID。"
+              ],
+              "code_blocks": [
+                {
+                  "title": "1. 创建订单",
+                  "desc": "UI层提交购物车数据，BLL层校验后调用存储过程，触发器自动扣减库存。",
+                  "segments": [
+                    {
+                      "label": "UI层 - FrmOrder.cs",
+                      "lines": [
+                        "private void BtnSubmit_Click(object sender, EventArgs e)",
+                        "{",
+                        "    try",
+                        "    {",
+                        "        if (_cart.Count == 0)",
+                        "            throw new BusinessException(\"购物车为空，请先添加商品\");",
+                        "",
+                        "        OrderInfo order = new()",
+                        "        {",
+                        "            PaymentMethod = cboPayMethod.SelectedItem.ToString(),",
+                        "            PaymentStatus = cboPayStatus.SelectedItem.ToString(),",
+                        "            ReceiverName = txtReceiverNameOrder.Text.Trim(),",
+                        "            ReceiverPhone = txtPhone.Text.Trim(),",
+                        "            ReceiverAddress = txtAddress.Text.Trim(),",
+                        "            Items = new List<OrderItemInfo>(_cart)",
+                        "        };",
+                        "",
+                        "        _orderManager.CreateOrder(order);",
+                        "        _cart.Clear();",
+                        "        BindOrderGrid();",
+                        "        MessageBox.Show(\"订单创建成功\", \"提示\");",
+                        "    }",
+                        "    catch (Exception ex) { UiHelper.HandleException(ex, this); }",
+                        "}"
+                      ]
+                    },
+                    {
+                      "label": "BLL层 - OrderManager.cs",
+                      "lines": [
+                        "public int CreateOrder(OrderInfo order)",
+                        "{",
+                        "    if (order.Items == null || order.Items.Count == 0)",
+                        "        throw new BusinessException(\"购物车为空，请先添加商品\");",
+                        "",
+                        "    foreach (var item in order.Items)",
+                        "    {",
+                        "        if (item.Quantity <= 0)",
+                        "            throw new BusinessException($\"商品 [{item.ProductName}] 购买数量必须大于0\");",
+                        "    }",
+                        "",
+                        "    try",
+                        "    {",
+                        "        // 调用存储过程：内部事务+触发器扣减库存",
+                        "        return _repo.CreateOrder(order);",
+                        "    }",
+                        "    catch (SqlException ex) when (ex.Message.Contains(\"库存不足\"))",
+                        "    {",
+                        "        // 触发器抛出的库存不足错误转为业务异常",
+                        "        throw new BusinessException(ex.Message, ex);",
+                        "    }",
+                        "}"
+                      ]
+                    },
+                    {
+                      "label": "DAL层 - OrderRepository.cs",
+                      "lines": [
+                        "public int CreateOrder(OrderInfo order)",
+                        "{",
+                        "    // 构建 Table-Valued Parameter",
+                        "    DataTable itemsTable = new();",
+                        "    itemsTable.Columns.Add(\"productID\", typeof(int));",
+                        "    itemsTable.Columns.Add(\"productName\", typeof(string));",
+                        "    itemsTable.Columns.Add(\"unitPrice\", typeof(decimal));",
+                        "    itemsTable.Columns.Add(\"quantity\", typeof(int));",
+                        "    foreach (var item in order.Items)",
+                        "        itemsTable.Rows.Add(item.ProductID, item.ProductName,",
+                        "            item.UnitPrice, item.Quantity);",
+                        "",
+                        "    SqlParameter itemsParam = new(\"@items\", itemsTable)",
+                        "    {",
+                        "        SqlDbType = SqlDbType.Structured,",
+                        "        TypeName = \"dbo.OrderItemListType\"",
+                        "    };",
+                        "",
+                        "    object result = ExecuteSpScalar(\"sp_Order_Create\",",
+                        "        MakeParam(\"@paymentMethod\", order.PaymentMethod),",
+                        "        MakeParam(\"@paymentStatus\", order.PaymentStatus),",
+                        "        MakeParam(\"@receiverName\", order.ReceiverName),",
+                        "        MakeParam(\"@receiverPhone\", order.ReceiverPhone),",
+                        "        MakeParam(\"@receiverAddress\", order.ReceiverAddress),",
+                        "        itemsParam);",
+                        "    return Convert.ToInt32(result);",
+                        "}"
+                      ]
+                    },
+                    {
+                      "label": "数据库层 - 触发器 tr_OrderItem_Insert",
+                      "lines": [
+                        "CREATE TRIGGER tr_OrderItem_Insert",
+                        "ON tbl_OrderItem AFTER INSERT",
+                        "AS",
+                        "BEGIN",
+                        "    SET NOCOUNT ON;",
+                        "    -- 库存充足性检查",
+                        "    IF EXISTS (",
+                        "        SELECT 1 FROM inserted i",
+                        "        JOIN tbl_Product p ON i.productID = p.productID",
+                        "        WHERE p.stockQuantity - i.quantity < 0",
+                        "    )",
+                        "    BEGIN",
+                        "        DECLARE @productName NVARCHAR(50);",
+                        "        SELECT TOP 1 @productName = p.productName",
+                        "        FROM inserted i JOIN tbl_Product p ON i.productID = p.productID",
+                        "        WHERE p.stockQuantity - i.quantity < 0;",
+                        "        RAISERROR(N'商品 [%s] 库存不足', 16, 1, @productName);",
+                        "        ROLLBACK TRANSACTION;",
+                        "        RETURN;",
+                        "    END",
+                        "    -- 扣减库存",
+                        "    UPDATE p SET p.stockQuantity = p.stockQuantity - i.quantity",
+                        "    FROM tbl_Product p JOIN inserted i ON p.productID = i.productID;",
+                        "    -- 更新订单总金额",
+                        "    UPDATE o SET o.totalAmount = (",
+                        "        SELECT ISNULL(SUM(amount), 0) FROM tbl_OrderItem",
+                        "        WHERE orderID = i.orderID)",
+                        "    FROM tbl_Order o",
+                        "    JOIN (SELECT DISTINCT orderID FROM inserted) i",
+                        "        ON o.orderID = i.orderID;",
+                        "END;"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "2. 确认结款",
+                  "desc": "管理员将未结款订单更新为已结款状态，存储过程自动记录结款时间。",
+                  "segments": [
+                    {
+                      "label": "BLL层 - OrderManager.cs",
+                      "lines": [
+                        "public int Confirm(int orderID)",
+                        "{",
+                        "    if (orderID <= 0)",
+                        "        throw new BusinessException(\"请选择要结款的订单\");",
+                        "    int result = _repo.Confirm(orderID);",
+                        "    if (result == 0)",
+                        "        throw new BusinessException(\"该订单已结款或不存在，无需重复操作\");",
+                        "    return result;",
+                        "}"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "3. 订单查询",
+                  "desc": "按收货人名称、结款状态组合条件检索订单列表。",
+                  "segments": [
+                    {
+                      "label": "DAL层 - OrderRepository.cs",
+                      "lines": [
+                        "public DataTable Search(string receiverName, string paymentStatus)",
+                        "{",
+                        "    List<string> conditions = new();",
+                        "    List<SqlParameter> parameters = new();",
+                        "    if (!string.IsNullOrWhiteSpace(receiverName))",
+                        "    {",
+                        "        conditions.Add(\"receiverName LIKE @receiverName\");",
+                        "        parameters.Add(MakeParam(\"@receiverName\", $\"%{receiverName}%\"));",
+                        "    }",
+                        "    if (!string.IsNullOrWhiteSpace(paymentStatus))",
+                        "    {",
+                        "        conditions.Add(\"paymentStatus = @paymentStatus\");",
+                        "        parameters.Add(MakeParam(\"@paymentStatus\", paymentStatus));",
+                        "    }",
+                        "    string whereClause = conditions.Count > 0",
+                        "        ? string.Join(\" AND \", conditions) : null;",
+                        "    return ExecuteViewDataTable(\"(SELECT * FROM tbl_Order) AS t\",",
+                        "        whereClause, parameters.ToArray());",
+                        "}"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    "chapter4": {
+      "title": "第4章 系统测试",
+      "intro": "软件生命周期的每个阶段都不可回避地会产生差错，力求在每个阶段加速之前通过严格的技术审查尽可能早地发现并纠正错误。测试的目的就是在软件投入实际使用前，尽可能地多发现软件中的错误，实现对软件规格说明设计和程序代码的最终审查。",
+      "sections": [
+        {
+          "heading": "4.1 系统测试的原则",
+          "paragraphs": [
+            "1.尽早地和不断地进行软件测试",
+            "应当把软件测试贯穿到整个软件开发的过程中，而不应该把软件测试看作是其过程中的一个独立阶段。因为在软件开发的每一环节都有可能产生意想不到的问题，其影响因素有很多，比如软件本身的抽象性和复杂性、软件所涉及的学科、软件开发过程的各类人员之间的通信因素等等。",
+            "2.对测试用例要有正确的态度",
+            "第一，测试用例应当由测试输入数据和预期输出结果这两部分组成；第二，在设计测试用例时，不仅要考虑合理的输入条件，更要注意不合理的输入条件。因为软件投入实际运行中，往往不遵守正常的使用方法，却进行了一些甚至意外的输入。",
+            "3.严格执行测试计划，排除测试的随意性，以避免发生疏漏或者重复无效工作。",
+            "4.应当对每一个测试结果进行全面检查。一定要全面地、仔细地检查测试结果，但常常被人们忽略，导致许多错误被遗漏。",
+            "5.妥善保存测试用例、测试计划、测试报告和最终分析报告，以备回归测试及维护之用。",
+            "在遵守以上原则的基础上进行软件测试，可以以最少的时间和人力找出软件中的各种缺陷，从而达到保证软件质量的目的。"
+          ]
+        },
+        {
+          "heading": "4.2 测试结果",
+          "paragraphs": [
+            "主要对系统功能模块进行测试，得到的测试结果如下表4-1所示。"
+          ],
+          "test_table": {
+            "title": "表4-1系统测试结果表",
+            "headers": ["测试项目", "验证过程", "预期结果", "实际结果", "结论说明"],
+            "rows": [
+              ["管理员登录", "输入用户名admin密码123456选择管理员身份", "进入主窗体全部功能可用", "进入主窗体全部功能可用", "测试成功通过"],
+              ["店员登录", "输入用户名clerk密码123456选择店员身份", "进入主窗体管理类按钮禁用", "进入主窗体管理类按钮禁用", "测试成功通过"],
+              ["登录失败", "输入错误密码或不匹配的身份", "弹出错误提示清空密码框", "弹出错误提示清空密码框", "测试成功通过"],
+              ["商品类别添加", "录入类别名称和描述提交", "列表新增记录添加时间自动记录", "列表新增记录添加时间自动记录", "测试成功通过"],
+              ["商品类别删除", "选中有关联商品的类别执行删除", "提示存在关联商品无法删除", "提示存在关联商品无法删除", "测试成功通过"],
+              ["商品添加", "选择类别和供货商录入商品信息提交", "列表新增记录displayNo自动生成", "列表新增记录displayNo自动生成", "测试成功通过"],
+              ["商品查询", "按名称类别供货商组合条件检索", "列表正确过滤显示含类别和供货商名称", "列表正确过滤显示含类别和供货商名称", "测试成功通过"],
+              ["商品删除", "选中有订单明细的商品执行删除", "提示存在订单明细无法删除", "提示存在订单明细无法删除", "测试成功通过"]
+            ],
+            "continued_title": "续表4-1",
+            "continued_rows": [
+              ["供货商添加", "录入供货商信息提交", "列表新增记录", "列表新增记录", "测试成功通过"],
+              ["供货商删除", "选中有关联商品的供货商执行删除", "提示存在关联商品无法删除", "提示存在关联商品无法删除", "测试成功通过"],
+              ["创建订单-单商品", "选择1个商品加入购物车提交", "订单创建成功库存扣减正确", "订单创建成功库存扣减正确", "测试成功通过"],
+              ["创建订单-多商品", "选择多个商品加入购物车提交", "订单含多条明细总金额正确库存分别扣减", "订单含多条明细总金额正确库存分别扣减", "测试成功通过"],
+              ["创建订单-库存不足", "购买数量超过库存时提交", "触发器回滚提示库存不足", "触发器回滚提示库存不足", "测试成功通过"],
+              ["创建订单-空购物车", "购物车为空时提交", "提示购物车为空请先添加商品", "提示购物车为空请先添加商品", "测试成功通过"],
+              ["确认结款", "选中未结款订单点击确认结款", "状态更新为已结款结款时间自动记录", "状态更新为已结款结款时间自动记录", "测试成功通过"],
+              ["重复结款", "选中已结款订单点击确认结款", "提示该订单已结款无需重复操作", "提示该订单已结款无需重复操作", "测试成功通过"],
+              ["用户添加", "录入用户信息两次密码一致后提交", "添加成功用户名唯一性校验通过", "添加成功用户名唯一性校验通过", "测试成功通过"],
+              ["用户删除", "选中当前登录用户执行删除", "提示不允许删除当前登录用户", "提示不允许删除当前登录用户", "测试成功通过"],
+              ["密码修改", "输入正确旧密码和新密码提交", "密码修改成功", "密码修改成功", "测试成功通过"],
+              ["库存预警", "点击库存预警按钮", "列表显示库存低于20的商品按库存升序排列", "列表显示库存低于20的商品按库存升序排列", "测试成功通过"],
+              ["数据库连接异常", "断开数据库连接后执行操作", "弹出友好提示不崩溃", "弹出友好提示不崩溃", "测试成功通过"]
+            ],
+            "col_widths": [1560, 2517, 1452, 1559, 1454]
+          }
+        }
+      ]
+    }
+  },
+
+  "conclusion": {
+    "title": "结 论",
+    "intro": "校园易购信息管理系统是基于C/S三层架构、C#开发语言（.NET 8.0）、Visual Studio 2022开发环境以及SQL Server 2019数据库管理系统进行构建开发的。系统采用存储过程+视图+触发器+计算列的数据库端逻辑架构，将业务规则下沉至数据库层，确保数据一致性和业务规则的强制执行。具体实现的功能如下：",
+    "functions": [
+      "1．登录模块，用户输入用户名、密码并选择身份（管理员/店员），系统通过存储过程sp_User_Validate验证身份，密码采用SHA-256哈希加密存储，确保安全性；",
+      "2．商品类别管理，管理员可对商品类别执行增、删、改、查操作，采用扁平结构加排序号设计，删除前检查关联商品；",
+      "3．商品信息管理，管理员可对商品执行增、删、改、查操作，通过视图v_Product_Detail自动关联类别名称和供货商名称，displayNo计算列自动生成可读编号；",
+      "4．供货商管理，管理员可对供货商档案执行增、删、改、查操作，删除前检查关联商品；",
+      "5．订单管理，用户通过购物车模式创建订单，存储过程sp_Order_Create在同一事务中插入订单和明细，tr_OrderItem_Insert触发器自动扣减库存并检查库存不足，amount计算列自动计算小计金额，totalAmount由触发器自动维护；",
+      "6．用户管理，管理员可对系统用户执行增、删、改操作，区分管理员和店员权限；",
+      "7．库存预警，管理员可查看库存低于20的商品列表，通过视图v_LowStock_Product获取数据。"
+    ],
+    "tech_intro": "在系统开发过程中使用和扩展的关键技术如下：",
+    "technologies": [
+      "1．存储过程驱动架构，系统定义了15个存储过程覆盖全部CRUD操作，DAL层通过CommandType=StoredProcedure调用，不拼接任何SQL语句，天然防止SQL注入；",
+      "2．触发器自动库存扣减，tr_OrderItem_Insert触发器在插入订单明细时自动扣减库存并检查库存不足，确保无论通过何种途径插入订单明细库存都会被正确扣减；",
+      "3．视图绑定技术，通过v_Product_Detail等3个视图将多表JOIN结果封装为虚拟表，DAL层查询时无需手写JOIN语句，DataGridView直接绑定视图结果；",
+      "4．计算列自动计算，displayNo、amount、totalAmount三个PERSISTED计算列由数据库引擎自动维护，无需应用层计算；",
+      "5．Table-Valued Parameter，sp_Order_Create使用表值参数一次性传递商品明细列表，减少网络往返，提高创建订单的性能；",
+      "6．SHA-256密码哈希，密码明文在应用层计算哈希后传入存储过程，数据库不存储明文密码；",
+      "7．三层架构（UI/BLL/DAL），表示层、业务逻辑层和数据访问层分离，BaseRepository基类封装通用存储过程调用方法，子类通过继承复用。"
+    ],
+    "limitation_intro": "系统具有一定的局限性，具体体现在：",
+    "limitations": [
+      "1．库存预警阈值固定为20件，硬编码于视图v_LowStock_Product中，不支持动态调整；",
+      "2．不支持商品退货流程，订单创建后无法撤销或修改；",
+      "3．购物车数据仅存在于内存中，不持久化，应用重启后丢失；",
+      "4．未实现在线支付对接，支付状态由管理员手动确认。"
+    ]
+  },
+
+  "references": {
+    "title": "参考文献",
+    "items": [
+      "[1]江红．C#程序设计教程[M]．北京：清华大学出版社，2024．",
+      "[2]明日科技．SQL Server完全自学教程[M]．北京：人民邮电出版社，2023．",
+      "[3]曹宇，许高峰，王佳丽．C#程序设计与编程案例[M]．北京：清华大学出版社，2022．",
+      "[4]崔祥．基于Web的在线购物系统设计[J]．无线互联科技，2022，19(24)：71-74．",
+      "[5]李春葆．C#程序设计教程[M]．北京：清华大学出版社，2018．",
+      "[6]吕凯．数据库原理及应用—SQL Server 2019[M]．北京：清华大学出版社，2021．"
+    ],
+    "note": "注：将任务书中的参考文献放到这里，自己再找2~3篇相关的文献",
+    "note2": "到校园网图书馆的中国知网寻找参考文献。"
+  },
+
+  "appendix": {
+    "team_name": "校园易购信息管理系统开发团队",
+    "instructor": "王磊",
+    "leader": "程静",
+    "recorder": "谢明天",
+    "members": "张红洋、谢明天、胡云鹏",
+    "location": "1C205",
+    "grade_date": "2026年7月28日",
+
+    "meetings": [
+      {
+        "title": "附录1团队开发会议记录1",
+        "doc_title": "校园易购信息管理系统开发团队会议记录1",
+        "date": "2026-07-06",
+        "subject": "项目开发背景调研及基本功能模块设计",
+        "content_summary": [
+          "项目开发背景调研",
+          "系统基本功能模块设计",
+          "系统开发进度安排"
+        ],
+        "content_details": [
+          "项目开发背景调研：\n通过文献检索、网络查询等方式，对校园商品管理系统开发背景进行调研。随着校园信息化的推进，传统校园超市存在排队时间长、商品信息不透明、库存管理粗放等问题。校园易购信息管理系统的开发将使商品管理工作规范化、系统化、程序化，提高信息处理的速度和准确性。",
+          "系统基本功能模块设计：\n（1）登录模块：完成用户的登录操作，区分管理员和店员权限。\n（2）商品类别管理模块：完成商品类别的信息管理。\n（3）商品信息管理模块：完成商品信息的管理，含可读编号、库存等。\n（4）供货商管理模块：完成供货商档案的管理。\n（5）订单管理模块：购物车模式下单，触发器自动扣减库存。\n（6）用户管理模块：管理系统用户和权限。\n（7）库存预警模块：展示低库存商品列表。",
+          "系统开发进度安排：（共80学时）\n    第1周：需求分析、系统设计\n    第2周：数据库设计、编码实现\n    第3周：编码实现、系统测试\n    第4周：系统测试、报告撰写"
+        ],
+        "communication_summary": [
+          "项目成员沟通顺畅，充分了解彼此想法，有利于项目的推进",
+          "个人项目成员对讨论内容仍有疑问，经过详细讨论后达成共识"
+        ],
+        "discipline_summary": [
+          "团队无人迟到早退，按时参加会议",
+          "团队成员服从领导和安排"
+        ]
+      },
+      {
+        "title": "附录2团队开发会议记录2",
+        "doc_title": "校园易购信息管理系统开发团队会议记录2",
+        "date": "2026-07-16",
+        "subject": "项目开发关键技术交流及功能代码测试",
+        "content_summary": [
+          "项目开发关键技术交流",
+          "系统功能模块测试"
+        ],
+        "content_details": [
+          "项目开发关键技术交流：\n对系统开发过程中遇到的关键技术问题进行讨论和交流，包括存储过程设计、触发器库存扣减机制、视图绑定、Table-Valued Parameter传递明细列表、SHA-256密码哈希等方面。重点讨论了触发器tr_OrderItem_Insert的库存检查和回滚机制，确保订单创建时库存不足能够自动回滚事务。",
+          "系统功能代码测试：\n（1）程静：商品类别管理模块测试\n（2）张红洋：用户管理模块测试\n（3）谢明天：订单管理模块测试（含触发器验证）\n（4）胡云鹏：系统登录模块测试"
+        ],
+        "communication_summary": [
+          "项目成员沟通顺畅，对于关键技术实现方法的讨论积极有效",
+          "个人项目成员对讨论内容仍有疑问，经过详细讨论后达成共识"
+        ],
+        "discipline_summary": [
+          "团队无人迟到早退，按时参加会议",
+          "团队成员服从领导和安排"
+        ]
+      }
+    ],
+
+    "grade_table": {
+      "title": "东北石油大学课程设计成绩评价表",
+      "course_name": "面向对象课程设计",
+      "subject": "校园易购信息管理系统的开发",
+      "eval_student_name": "李轩赫",
+      "eval_student_id": "250702940701",
+      "eval_instructor": "王磊",
+      "eval_instructor_title": "讲师",
+      "eval_items": [
+        {
+          "name": "团队合作\n（10分）",
+          "max_score": "10",
+          "a_standard": "针对系统需求及基本功能设计进行深入的团队沟通与合作",
+          "c_standard": "针对系统需求及基本功能设计进行基本的团队沟通与合作"
+        },
+        {
+          "name": "需求分析及系统设计\n（15分）",
+          "max_score": "15",
+          "a_standard": "系统功能分析清楚，任务分解准确。系统架构设计合理",
+          "c_standard": "有一定分析和设计能力，对系统的功能模块能进行基本的分析和设计",
+          "sub_items": [
+            {
+              "a_standard": "数据库表结构设计合理、类型准确、关系清晰，存储过程/视图/触发器/计算列设计完整",
+              "c_standard": "基本完成了数据库表结构的设计，有一定的数据关系分析"
+            }
+          ]
+        },
+        {
+          "name": "程序编码\n（25分）",
+          "max_score": "25",
+          "a_standard": "程序编码准确，页面布局合理，业务实现流程完整，三层架构清晰",
+          "c_standard": "基本完成了程序功能代码的编写，业务流程较为完整"
+        },
+        {
+          "name": "论文质量\n（25分）",
+          "max_score": "25",
+          "a_standard": "将课程实践成果以课程设计报告的形式加以呈现，内容完整、格式规范",
+          "c_standard": "内容70%以上符合撰写要求，理论与分析基本正确",
+          "sub_items": [
+            {
+              "a_standard": "针对课程设计内容检索并深入分析相关文献，文献检索达到5篇以上",
+              "c_standard": "文献检索与课程设计内容基本符合，能对文献做基本的分析和总结"
+            }
+          ]
+        },
+        {
+          "name": "自主学习\n（15分）",
+          "max_score": "15",
+          "a_standard": "系统设计与开发过程中，能够理性分析、提出问题，并尝试采取新思路，如存储过程+触发器架构",
+          "c_standard": "能够解决系统设计与开发过程中遇到的问题，具有一定的自主学习能力"
+        }
+      ],
+      "conclusion_text": "评语：\n系统建设实践任务的完成情况、工作态度、沟通与协作能力"
+    }
+  }
+}
