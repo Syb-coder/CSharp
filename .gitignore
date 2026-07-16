@@ -104,3 +104,17 @@ appsettings.Development.json
 *.secrets.json
 secrets.json
 Web.config.local
+
+# ============================
+# Python 缓存
+# ============================
+__pycache__/
+*.pyc
+*.pyo
+
+# ============================
+# 归档压缩包
+# ============================
+*.zip
+*.rar
+*.7z
