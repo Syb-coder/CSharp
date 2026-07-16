@@ -72,6 +72,8 @@ public class ReaderService
     /// <exception cref="BusinessException">存在未归还图书或删除失败</exception>
     public void DeleteReader(string readerID)
     {
+        // 参照完整性保护：存在未归还借阅记录的读者不允许删除
+        // 否则借阅记录中的 readerID 将变成悬空引用，还书时无法关联读者信息
         int unreturnedCount = _readerDAL.CountUnreturnedBorrows(readerID);
         if (unreturnedCount > 0)
         {
@@ -103,10 +105,13 @@ public class ReaderService
         {
             throw new BusinessException("姓名不能为空");
         }
+        // 姓名长度限制 8 个字符（NVarChar），对应中文姓名最多约 4 个汉字，符合国内姓名惯例
         if (ValidationHelper.IsExceedLength(reader.ReaderName, 8))
         {
             throw new BusinessException("姓名长度不能超过8个字符");
         }
+        // 性别校验使用硬编码枚举值"男"/"女"而非枚举类型，因为数据库字段为 NVarChar(2)
+        // 业务约束：只接受这两个确定值，拒绝其他任何输入
         if (reader.ReaderSex != "男" && reader.ReaderSex != "女")
         {
             throw new BusinessException("性别必须为男或女");

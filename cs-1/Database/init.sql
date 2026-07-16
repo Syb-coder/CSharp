@@ -32,8 +32,10 @@ GO
 IF OBJECT_ID('tbl_BookCategory', 'U') IS NULL
 BEGIN
     CREATE TABLE tbl_BookCategory (
-        categoryID   NVARCHAR(10)  NOT NULL,
-        categoryName NVARCHAR(20)  NOT NULL,
+        categoryID   NVARCHAR(10)   NOT NULL,
+        categoryName NVARCHAR(20)   NOT NULL,
+        borrowDays   INT            NOT NULL DEFAULT 30,   -- 可借阅天数
+        finePerDay   DECIMAL(10, 2) NOT NULL DEFAULT 0.50, -- 单日逾期罚款标准（元/天）
         CONSTRAINT PK_tbl_BookCategory PRIMARY KEY (categoryID)
     );
 END
@@ -115,10 +117,10 @@ GO
 -- 3.2 图书类别数据
 IF NOT EXISTS (SELECT 1 FROM tbl_BookCategory)
 BEGIN
-    INSERT INTO tbl_BookCategory (categoryID, categoryName) VALUES
-    (N'C01', N'计算机类'),
-    (N'C02', N'文学类'),
-    (N'C03', N'经济类');
+    INSERT INTO tbl_BookCategory (categoryID, categoryName, borrowDays, finePerDay) VALUES
+    (N'C01', N'计算机类', 15, 1.00),
+    (N'C02', N'文学类',   30, 0.50),
+    (N'C03', N'经济类',   20, 0.80);
 END
 GO
 

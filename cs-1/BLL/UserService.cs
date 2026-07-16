@@ -21,6 +21,10 @@ public class UserService
     /// <exception cref="BusinessException">用户不存在、密码错误或身份不匹配</exception>
     public User Login(string userName, string password, string role)
     {
+        // 登录验证三步设计：用户存在 -> 密码匹配 -> 身份匹配
+        // 逐步校验而非合并校验，是为了给出精确的错误提示（区分"用户不存在"和"密码错误"）
+        // 安全考虑：虽然分开提示理论上会暴露用户是否存在，但本系统为内部管理系统，可接受此取舍
+
         // 卫语句：校验输入非空
         if (ValidationHelper.IsNullOrWhiteSpace(userName))
         {
@@ -35,19 +39,21 @@ public class UserService
             throw new BusinessException("请选择身份");
         }
 
+        // 第一步：查询用户是否存在
         User user = _userDAL.GetUserByName(userName);
         if (user == null)
         {
             throw new BusinessException("用户不存在");
         }
 
-        // 验证密码哈希
+        // 第二步：验证密码哈希（PasswordHelper.Verify 内部对明文做 SHA-256 后与存储的哈希比较）
         if (!PasswordHelper.Verify(password, user.UserPassword))
         {
             throw new BusinessException("密码错误");
         }
 
-        // 验证身份是否一致
+        // 第三步：验证身份是否一致（管理员/普通用户必须与注册时的权限匹配）
+        // 防止普通用户通过选择"管理员"身份登录获取高权限
         if (user.UserPurview != role)
         {
             throw new BusinessException("身份信息不符");
@@ -130,7 +136,8 @@ public class UserService
             throw new BusinessException("权限必须为管理员或普通用户");
         }
 
-        // 密码为空表示不修改密码，保留原密码
+        // 密码为空表示不修改密码，保留原密码哈希
+        // 设计原因：修改用户权限时不应强制要求重设密码，降低操作摩擦
         string passwordHash = existingUser.UserPassword;
         if (!ValidationHelper.IsNullOrWhiteSpace(password))
         {
@@ -159,6 +166,8 @@ public class UserService
     /// <exception cref="BusinessException">校验失败</exception>
     public void DeleteUser(string userName, string currentUserName)
     {
+        // 安全保护：禁止删除当前登录用户自身账号
+        // 否则管理员删除自己后，会话状态与数据库不一致，导致后续操作权限校验异常
         if (userName == currentUserName)
         {
             throw new BusinessException("不允许删除当前登录用户自身账号");
@@ -180,9 +189,13 @@ public class UserService
     /// <exception cref="BusinessException">校验失败</exception>
     public void ChangePassword(string userName, string oldPassword, string newPassword, string confirmPassword)
     {
+        // 修改密码校验流程：验证旧密码 -> 校验新密码合法性 -> 确认密码一致性
+        // 先验证旧密码确保操作者确实知道当前密码，防止会话劫持后改密码
+
         User user = _userDAL.GetUserByName(userName)
             ?? throw new BusinessException("用户不存在");
 
+        // 验证旧密码哈希，确认操作者身份
         if (!PasswordHelper.Verify(oldPassword, user.UserPassword))
         {
             throw new BusinessException("旧密码错误");
@@ -196,6 +209,7 @@ public class UserService
         {
             throw new BusinessException("新密码长度不能超过16个字符");
         }
+        // 确认密码一致性，防止用户输入错误
         if (newPassword != confirmPassword)
         {
             throw new BusinessException("两次输入的新密码不一致");

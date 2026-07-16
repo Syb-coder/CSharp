@@ -49,6 +49,7 @@ public class ChangePasswordForm : Form
             Font = new Font("Microsoft YaHei UI", 10F),
             Size = new Size(200, 25),
             Location = new Point(140, 28),
+            // 密码掩码显示，防止旁人窥屏获取明文
             UseSystemPasswordChar = true
         };
 
@@ -102,6 +103,7 @@ public class ChangePasswordForm : Form
     {
         try
         {
+            // 密码不做 Trim，因为密码中可能合法包含首尾空格
             _userService.ChangePassword(
                 _currentUser.UserName,
                 _txtOldPassword.Text,
@@ -109,13 +111,15 @@ public class ChangePasswordForm : Form
                 _txtConfirmPassword.Text);
 
             MessageBox.Show("密码修改成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            // 修改成功后关闭窗体
+            // 修改成功后关闭窗体，返回主窗体继续操作
             Close();
         }
+        // BusinessException 是业务层校验失败（如旧密码错误、两次密码不一致），属于用户可纠正的错误
         catch (BusinessException ex)
         {
             MessageBox.Show(ex.Message, "修改失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
+        // Exception 捕获系统级错误（如数据库连接失败），与业务错误区分提示
         catch (Exception ex)
         {
             MessageBox.Show($"修改失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);

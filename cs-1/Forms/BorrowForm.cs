@@ -24,7 +24,7 @@ public class BorrowForm : Form
     private readonly DataGridView _dgvBorrows;
 
     // ===== 操作区控件 =====
-    private readonly GroupBox _grpOperation;
+    private readonly Panel _grpOperation;
     private readonly TextBox _txtBorrowReaderID;
     private readonly TextBox _txtBorrowBookID;
     private readonly Button _btnBorrow;
@@ -47,67 +47,81 @@ public class BorrowForm : Form
         MaximizeBox = false;
         BackColor = Color.FromArgb(245, 247, 250);
 
-        // ===== 查询区：第一行（读者编号、图书编号、状态、查询按钮） =====
+        // ===== 查询区第一行：Label 宽度=AutoSize实际值（4字+冒号=100px, 2字+冒号=65px） =====
         Label lblReader = new()
         {
             Text = "读者编号：",
             Font = new Font("Microsoft YaHei UI", 9F),
             Location = new Point(15, 15),
-            AutoSize = true
+            AutoSize = false,
+            Size = new Size(100, 20),
+            TextAlign = ContentAlignment.MiddleLeft,
+            BackColor = Color.Transparent
         };
         _txtSearchReaderID = new TextBox
         {
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(85, 12),
-            Size = new Size(120, 25)
+            Location = new Point(120, 12),
+            Size = new Size(110, 25)
         };
         Label lblBook = new()
         {
             Text = "图书编号：",
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(220, 15),
-            AutoSize = true
+            Location = new Point(240, 15),
+            AutoSize = false,
+            Size = new Size(100, 20),
+            TextAlign = ContentAlignment.MiddleLeft,
+            BackColor = Color.Transparent
         };
         _txtSearchBookID = new TextBox
         {
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(290, 12),
-            Size = new Size(120, 25)
+            Location = new Point(345, 12),
+            Size = new Size(110, 25)
         };
         Label lblStatus = new()
         {
             Text = "状态：",
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(425, 15),
-            AutoSize = true
+            Location = new Point(465, 15),
+            AutoSize = false,
+            Size = new Size(65, 20),
+            TextAlign = ContentAlignment.MiddleLeft,
+            BackColor = Color.Transparent
         };
         _cboStatus = new ComboBox
         {
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(465, 12),
+            Location = new Point(535, 12),
             Size = new Size(80, 25),
             DropDownStyle = ComboBoxStyle.DropDownList
         };
+        // 首项"全部"在查询时转为 null，DAL 层将 null 转为 DBNull 表示不按状态过滤
         _cboStatus.Items.AddRange(new object[] { "全部", BusinessConstants.STATUS_BORROWED, BusinessConstants.STATUS_RETURNED });
         _cboStatus.SelectedIndex = 0;
 
-        _btnSearch = CreateButton("查询", 770, 10);
+        _btnSearch = CreateButton("查询", 780, 10);
         _btnSearch.Click += (s, e) => LoadData();
 
-        // ===== 查询区：第二行（借出日期起止，复选框控制是否启用过滤） =====
+        // ===== 查询区第二行：借出日期起止（5字+冒号=120px） =====
         Label lblStart = new()
         {
             Text = "借出日期起：",
             Font = new Font("Microsoft YaHei UI", 9F),
             Location = new Point(15, 48),
-            AutoSize = true
+            AutoSize = false,
+            Size = new Size(120, 20),
+            TextAlign = ContentAlignment.MiddleLeft,
+            BackColor = Color.Transparent
         };
         _dtpStartDate = new DateTimePicker
         {
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(100, 45),
-            Size = new Size(150, 25),
+            Location = new Point(140, 45),
+            Size = new Size(140, 25),
             Format = DateTimePickerFormat.Short,
+            // ShowCheckBox 使日期范围查询变为可选：未勾选表示不限制起止日期
             ShowCheckBox = true,
             Checked = false,
             Value = DateTime.Today
@@ -116,14 +130,17 @@ public class BorrowForm : Form
         {
             Text = "借出日期止：",
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(270, 48),
-            AutoSize = true
+            Location = new Point(290, 48),
+            AutoSize = false,
+            Size = new Size(120, 20),
+            TextAlign = ContentAlignment.MiddleLeft,
+            BackColor = Color.Transparent
         };
         _dtpEndDate = new DateTimePicker
         {
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(355, 45),
-            Size = new Size(150, 25),
+            Location = new Point(415, 45),
+            Size = new Size(140, 25),
             Format = DateTimePickerFormat.Short,
             ShowCheckBox = true,
             Checked = false,
@@ -139,20 +156,31 @@ public class BorrowForm : Form
             AllowUserToDeleteRows = false,
             ReadOnly = true,
             SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None,
             BackgroundColor = Color.White,
             BorderStyle = BorderStyle.FixedSingle,
-            AutoGenerateColumns = false
+            // 关闭自动生成列，改用 SetupGridColumns 手动定义列，以精确控制列顺序、表头文本和日期格式
+            AutoGenerateColumns = false,
+            RowHeadersVisible = false
         };
         SetupGridColumns();
 
-        // ===== 操作区：GroupBox 包含借书区与还书区 =====
-        _grpOperation = new GroupBox
+        // ===== 操作区（Panel 无圆角边框遮盖） =====
+        _grpOperation = new Panel
         {
-            Text = "借书 / 还书操作",
-            Font = new Font("Microsoft YaHei UI", 9F),
+            BorderStyle = BorderStyle.FixedSingle,
+            BackColor = Color.FromArgb(245, 247, 250),
             Location = new Point(15, 350),
             Size = new Size(855, 155)
+        };
+        Label lblGrpTitle = new()
+        {
+            Text = "借书 / 还书操作",
+            Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold),
+            ForeColor = Color.FromArgb(64, 158, 255),
+            Location = new Point(10, 5),
+            AutoSize = true,
+            BackColor = Color.Transparent
         };
 
         // 借书区：读者编号、图书编号输入框 + 确认借出按钮
@@ -161,36 +189,43 @@ public class BorrowForm : Form
             Text = "【借书】",
             Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold),
             ForeColor = Color.FromArgb(64, 158, 255),
-            Location = new Point(20, 22),
-            AutoSize = true
+            Location = new Point(15, 22),
+            AutoSize = true,
+            BackColor = Color.Transparent
         };
         Label lblBorrowReader = new()
         {
             Text = "读者编号：",
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(20, 55),
-            AutoSize = true
+            Location = new Point(15, 55),
+            AutoSize = false,
+            Size = new Size(100, 20),
+            TextAlign = ContentAlignment.MiddleLeft,
+            BackColor = Color.Transparent
         };
         _txtBorrowReaderID = new TextBox
         {
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(90, 52),
-            Size = new Size(120, 25)
+            Location = new Point(120, 52),
+            Size = new Size(110, 25)
         };
         Label lblBorrowBook = new()
         {
             Text = "图书编号：",
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(230, 55),
-            AutoSize = true
+            Location = new Point(240, 55),
+            AutoSize = false,
+            Size = new Size(100, 20),
+            TextAlign = ContentAlignment.MiddleLeft,
+            BackColor = Color.Transparent
         };
         _txtBorrowBookID = new TextBox
         {
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(300, 52),
-            Size = new Size(120, 25)
+            Location = new Point(345, 52),
+            Size = new Size(110, 25)
         };
-        _btnBorrow = CreateButton("确认借出", 20, 88);
+        _btnBorrow = CreateButton("确认借出", 15, 88);
         _btnBorrow.Size = new Size(100, 30);
 
         // 还书区：选中借出状态记录后点击确认归还
@@ -199,29 +234,32 @@ public class BorrowForm : Form
             Text = "【还书】",
             Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold),
             ForeColor = Color.FromArgb(64, 158, 255),
-            Location = new Point(450, 22),
-            AutoSize = true
+            Location = new Point(445, 22),
+            AutoSize = true,
+            BackColor = Color.Transparent
         };
         Label lblReturnTip = new()
         {
             Text = "请先在上方列表选中“借出”状态的记录",
             Font = new Font("Microsoft YaHei UI", 9F),
             ForeColor = Color.FromArgb(102, 102, 102),
-            Location = new Point(450, 55),
-            AutoSize = true
+            Location = new Point(445, 55),
+            AutoSize = true,
+            BackColor = Color.Transparent
         };
-        _btnReturn = CreateButton("确认归还", 450, 88);
+        _btnReturn = CreateButton("确认归还", 445, 88);
         _btnReturn.Size = new Size(100, 30);
 
         _grpOperation.Controls.AddRange(new Control[]
         {
+            lblGrpTitle,
             lblBorrowTitle, lblBorrowReader, _txtBorrowReaderID,
             lblBorrowBook, _txtBorrowBookID, _btnBorrow,
             lblReturnTitle, lblReturnTip, _btnReturn
         });
 
-        // 返回按钮
-        _btnBack = CreateButton("返回", 770, 515);
+        // 返回按钮（Y=510 适配 ClientSize 544，避免超出底部）
+        _btnBack = CreateButton("返回", 770, 510);
 
         // 事件绑定
         _btnBorrow.Click += BtnBorrow_Click;
@@ -253,41 +291,41 @@ public class BorrowForm : Form
             new DataGridViewTextBoxColumn
             {
                 Name = "ColBorrowID", HeaderText = "借阅编号",
-                DataPropertyName = nameof(BorrowRecord.BorrowID), FillWeight = 60
+                DataPropertyName = nameof(BorrowRecord.BorrowID), Width = 70
             },
             new DataGridViewTextBoxColumn
             {
                 Name = "ColReaderID", HeaderText = "读者编号",
-                DataPropertyName = nameof(BorrowRecord.ReaderID), FillWeight = 70
+                DataPropertyName = nameof(BorrowRecord.ReaderID), Width = 80
             },
             new DataGridViewTextBoxColumn
             {
                 Name = "ColReaderName", HeaderText = "读者姓名",
-                DataPropertyName = nameof(BorrowRecord.ReaderName), FillWeight = 80
+                DataPropertyName = nameof(BorrowRecord.ReaderName), Width = 80
             },
             new DataGridViewTextBoxColumn
             {
                 Name = "ColBookID", HeaderText = "图书编号",
-                DataPropertyName = nameof(BorrowRecord.BookID), FillWeight = 70
+                DataPropertyName = nameof(BorrowRecord.BookID), Width = 80
             },
             new DataGridViewTextBoxColumn
             {
                 Name = "ColBookName", HeaderText = "书名",
-                DataPropertyName = nameof(BorrowRecord.BookName), FillWeight = 120
+                DataPropertyName = nameof(BorrowRecord.BookName), Width = 160
             },
             new DataGridViewTextBoxColumn
             {
                 Name = "ColBorrowDate", HeaderText = "借出日期",
                 DataPropertyName = nameof(BorrowRecord.BorrowDate),
                 DefaultCellStyle = new DataGridViewCellStyle { Format = "yyyy-MM-dd" },
-                FillWeight = 90
+                Width = 95
             },
             new DataGridViewTextBoxColumn
             {
                 Name = "ColDueDate", HeaderText = "应还日期",
                 DataPropertyName = nameof(BorrowRecord.DueDate),
                 DefaultCellStyle = new DataGridViewCellStyle { Format = "yyyy-MM-dd" },
-                FillWeight = 90
+                Width = 95
             },
             new DataGridViewTextBoxColumn
             {
@@ -295,12 +333,12 @@ public class BorrowForm : Form
                 DataPropertyName = nameof(BorrowRecord.ReturnDate),
                 // 归还日期为 null 时显示为空字符串
                 DefaultCellStyle = new DataGridViewCellStyle { Format = "yyyy-MM-dd", NullValue = "" },
-                FillWeight = 90
+                Width = 95
             },
             new DataGridViewTextBoxColumn
             {
                 Name = "ColStatus", HeaderText = "状态",
-                DataPropertyName = nameof(BorrowRecord.Status), FillWeight = 60
+                DataPropertyName = nameof(BorrowRecord.Status), Width = 60
             }
         });
     }
@@ -381,7 +419,7 @@ public class BorrowForm : Form
             return;
         }
 
-        // 卫语句：仅"借出"状态可归还，避免重复归还
+        // 卫语句：仅"借出"状态可归还，避免重复归还同一记录
         if (record.Status != BusinessConstants.STATUS_BORROWED)
         {
             MessageBox.Show("该记录已归还，无需重复操作", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -395,11 +433,11 @@ public class BorrowForm : Form
 
         try
         {
-            int overdueDays = _borrowService.ReturnBook(record.BorrowID);
-            // 逾期天数>0 时先弹出逾期提示，但仍提示归还成功
+            (int overdueDays, decimal fineAmount) = _borrowService.ReturnBook(record.BorrowID);
+            // 逾期天数>0 时弹逾期提示，包含罚款金额
             if (overdueDays > 0)
             {
-                MessageBox.Show($"该书已逾期 {overdueDays} 天，请提醒读者注意", "逾期提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"该书已逾期 {overdueDays} 天，逾期罚款 {fineAmount:F2} 元，请提醒读者缴纳", "逾期提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             MessageBox.Show("归还成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LoadData();

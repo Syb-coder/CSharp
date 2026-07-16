@@ -59,6 +59,8 @@ public class UserDAL
         using SqlConnection conn = new(DBConnection.GetConnectionString());
         using SqlCommand cmd = new(sql, conn);
         cmd.Parameters.Add(new SqlParameter("@userName", SqlDbType.NVarChar, 16) { Value = user.UserName });
+        // userPassword 参数长度 64 对应 SHA-256 哈希的十六进制字符串长度（256 bit / 4 = 64 字符）
+        // 数据库存储的是哈希值而非明文密码，即使数据库泄露也无法直接获取密码
         cmd.Parameters.Add(new SqlParameter("@userPassword", SqlDbType.NVarChar, 64) { Value = user.UserPassword });
         cmd.Parameters.Add(new SqlParameter("@userPurview", SqlDbType.NVarChar, 16) { Value = user.UserPurview });
         conn.Open();

@@ -20,6 +20,7 @@ public class Reader
     /// <summary>所在院系</summary>
     public string Department { get; set; }
 
+    // 设为 nullable：批量导入历史读者数据时可能缺少注册日期，允许为 NULL 以兼容旧数据迁移
     /// <summary>注册日期</summary>
     public DateTime? RegisterDate { get; set; }
 }

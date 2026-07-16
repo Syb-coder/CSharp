@@ -15,7 +15,7 @@ public class BookCategoryDAL
     /// <returns>类别列表</returns>
     public List<BookCategory> GetAllCategories()
     {
-        const string sql = "SELECT categoryID, categoryName FROM tbl_BookCategory ORDER BY categoryID";
+        const string sql = "SELECT categoryID, categoryName, borrowDays, finePerDay FROM tbl_BookCategory ORDER BY categoryID";
         List<BookCategory> list = new();
         using SqlConnection conn = new(DBConnection.GetConnectionString());
         using SqlCommand cmd = new(sql, conn);
@@ -40,10 +40,12 @@ public class BookCategoryDAL
             return GetAllCategories();
         }
 
-        const string sql = "SELECT categoryID, categoryName FROM tbl_BookCategory WHERE categoryName LIKE @keyword ORDER BY categoryID";
+        // 参数化查询：keyword 作为 SqlParameter 传入，SQL 引擎将其视为纯数据而非代码片段，从根本上杜绝 SQL 注入
+        const string sql = "SELECT categoryID, categoryName, borrowDays, finePerDay FROM tbl_BookCategory WHERE categoryName LIKE @keyword ORDER BY categoryID";
         List<BookCategory> list = new();
         using SqlConnection conn = new(DBConnection.GetConnectionString());
         using SqlCommand cmd = new(sql, conn);
+        // 模糊查询需要在参数值两侧拼接 % 通配符，而非在 SQL 中直接拼接，确保用户输入中的 % 和 _ 不会被当作通配符解释
         cmd.Parameters.Add(new SqlParameter("@keyword", SqlDbType.NVarChar, 20) { Value = $"%{keyword}%" });
         conn.Open();
         using SqlDataReader reader = cmd.ExecuteReader();
@@ -61,7 +63,7 @@ public class BookCategoryDAL
     /// <returns>类别实体，未找到返回 null</returns>
     public BookCategory GetCategoryById(string categoryID)
     {
-        const string sql = "SELECT categoryID, categoryName FROM tbl_BookCategory WHERE categoryID = @categoryID";
+        const string sql = "SELECT categoryID, categoryName, borrowDays, finePerDay FROM tbl_BookCategory WHERE categoryID = @categoryID";
         using SqlConnection conn = new(DBConnection.GetConnectionString());
         using SqlCommand cmd = new(sql, conn);
         cmd.Parameters.Add(new SqlParameter("@categoryID", SqlDbType.NVarChar, 10) { Value = categoryID });
@@ -81,34 +83,41 @@ public class BookCategoryDAL
     /// <returns>成功返回 true，编号已存在返回 false</returns>
     public bool InsertCategory(BookCategory category)
     {
-        const string sql = "INSERT INTO tbl_BookCategory (categoryID, categoryName) VALUES (@categoryID, @categoryName)";
+        const string sql = "INSERT INTO tbl_BookCategory (categoryID, categoryName, borrowDays, finePerDay) VALUES (@categoryID, @categoryName, @borrowDays, @finePerDay)";
         using SqlConnection conn = new(DBConnection.GetConnectionString());
         using SqlCommand cmd = new(sql, conn);
         cmd.Parameters.Add(new SqlParameter("@categoryID", SqlDbType.NVarChar, 10) { Value = category.CategoryID });
         cmd.Parameters.Add(new SqlParameter("@categoryName", SqlDbType.NVarChar, 20) { Value = category.CategoryName });
+        cmd.Parameters.Add(new SqlParameter("@borrowDays", SqlDbType.Int) { Value = category.BorrowDays });
+        cmd.Parameters.Add(new SqlParameter("@finePerDay", SqlDbType.Decimal) { Value = category.FinePerDay, Precision = 10, Scale = 2 });
         conn.Open();
         try
         {
             return cmd.ExecuteNonQuery() > 0;
         }
-        catch (SqlException ex) when (ex.Number == 2627)
+        catch (SqlException ex) when (ex.Number == 2627) // 2627 = SQL Server 主键/唯一约束冲突错误码
         {
+            // 主键冲突时返回 false 而非抛异常，让 BLL 层据此向用户提示"编号已存在"
             return false;
         }
     }
 
     /// <summary>
-    /// 修改类别名称（编号不可修改）
+    /// 修改类别信息（编号不可修改）
     /// </summary>
     /// <param name="categoryID">类别编号</param>
     /// <param name="categoryName">新类别名称</param>
+    /// <param name="borrowDays">新可借阅天数</param>
+    /// <param name="finePerDay">新单日逾期罚款标准</param>
     /// <returns>成功返回 true</returns>
-    public bool UpdateCategory(string categoryID, string categoryName)
+    public bool UpdateCategory(string categoryID, string categoryName, int borrowDays, decimal finePerDay)
     {
-        const string sql = "UPDATE tbl_BookCategory SET categoryName = @categoryName WHERE categoryID = @categoryID";
+        const string sql = "UPDATE tbl_BookCategory SET categoryName = @categoryName, borrowDays = @borrowDays, finePerDay = @finePerDay WHERE categoryID = @categoryID";
         using SqlConnection conn = new(DBConnection.GetConnectionString());
         using SqlCommand cmd = new(sql, conn);
         cmd.Parameters.Add(new SqlParameter("@categoryName", SqlDbType.NVarChar, 20) { Value = categoryName });
+        cmd.Parameters.Add(new SqlParameter("@borrowDays", SqlDbType.Int) { Value = borrowDays });
+        cmd.Parameters.Add(new SqlParameter("@finePerDay", SqlDbType.Decimal) { Value = finePerDay, Precision = 10, Scale = 2 });
         cmd.Parameters.Add(new SqlParameter("@categoryID", SqlDbType.NVarChar, 10) { Value = categoryID });
         conn.Open();
         return cmd.ExecuteNonQuery() > 0;
@@ -152,7 +161,9 @@ public class BookCategoryDAL
         return new BookCategory
         {
             CategoryID = reader["categoryID"].ToString(),
-            CategoryName = reader["categoryName"].ToString()
+            CategoryName = reader["categoryName"].ToString(),
+            BorrowDays = Convert.ToInt32(reader["borrowDays"]),
+            FinePerDay = Convert.ToDecimal(reader["finePerDay"])
         };
     }
 }

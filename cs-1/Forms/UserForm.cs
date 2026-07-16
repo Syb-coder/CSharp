@@ -15,7 +15,7 @@ public class UserForm : Form
     private readonly TextBox _txtPassword;
     private readonly TextBox _txtConfirmPassword;
     private readonly ComboBox _cmbRole;
-    private readonly GroupBox _grpInput;
+    private readonly Panel _grpInput;
     private readonly Button _btnAdd;
     private readonly Button _btnUpdate;
     private readonly Button _btnDelete;
@@ -52,51 +52,63 @@ public class UserForm : Form
             SelectionMode = DataGridViewSelectionMode.FullRowSelect,
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
             BackgroundColor = Color.White,
-            BorderStyle = BorderStyle.FixedSingle
+            BorderStyle = BorderStyle.FixedSingle,
+            RowHeadersVisible = false
         };
         _dgvUsers.SelectionChanged += DgvUsers_SelectionChanged;
 
-        // 输入区域
-        _grpInput = new GroupBox
+        // 输入区域（Panel 无圆角边框遮盖）
+        _grpInput = new Panel
         {
-            Text = "用户信息",
-            Font = new Font("Microsoft YaHei UI", 9F),
+            BorderStyle = BorderStyle.FixedSingle,
+            BackColor = Color.FromArgb(245, 247, 250),
             Location = new Point(15, 275),
             Size = new Size(650, 150)
         };
+        Label lblGrpTitle = new()
+        {
+            Text = "用户信息",
+            Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold),
+            ForeColor = Color.FromArgb(64, 158, 255),
+            Location = new Point(10, 5),
+            AutoSize = true,
+            BackColor = Color.Transparent
+        };
 
-        Label lblUserName = new() { Text = "用户名：", Location = new Point(20, 30), AutoSize = true, Font = new Font("Microsoft YaHei UI", 9F) };
-        _txtUserName = new TextBox { Location = new Point(90, 27), Size = new Size(150, 25), Font = new Font("Microsoft YaHei UI", 9F) };
+        // Label 宽度=AutoSize实际值：3字+冒号=65px, 4字+冒号=100px
+        Label lblUserName = new() { Text = "用户名：", Location = new Point(15, 30), AutoSize = false, Size = new Size(65, 20), TextAlign = ContentAlignment.MiddleLeft, Font = new Font("Microsoft YaHei UI", 9F), BackColor = Color.Transparent };
+        _txtUserName = new TextBox { Location = new Point(85, 27), Size = new Size(150, 25), Font = new Font("Microsoft YaHei UI", 9F) };
 
-        Label lblPassword = new() { Text = "密码：", Location = new Point(260, 30), AutoSize = true, Font = new Font("Microsoft YaHei UI", 9F) };
+        Label lblPassword = new() { Text = "密码：", Location = new Point(250, 30), AutoSize = false, Size = new Size(65, 20), TextAlign = ContentAlignment.MiddleLeft, Font = new Font("Microsoft YaHei UI", 9F), BackColor = Color.Transparent };
         _txtPassword = new TextBox { Location = new Point(320, 27), Size = new Size(150, 25), Font = new Font("Microsoft YaHei UI", 9F), UseSystemPasswordChar = true };
 
-        Label lblConfirm = new() { Text = "确认密码：", Location = new Point(20, 65), AutoSize = true, Font = new Font("Microsoft YaHei UI", 9F) };
-        _txtConfirmPassword = new TextBox { Location = new Point(90, 62), Size = new Size(150, 25), Font = new Font("Microsoft YaHei UI", 9F), UseSystemPasswordChar = true };
+        Label lblConfirm = new() { Text = "确认密码：", Location = new Point(15, 65), AutoSize = false, Size = new Size(100, 20), TextAlign = ContentAlignment.MiddleLeft, Font = new Font("Microsoft YaHei UI", 9F), BackColor = Color.Transparent };
+        // 确认密码同样使用掩码，与密码框保持一致的输入体验
+        _txtConfirmPassword = new TextBox { Location = new Point(120, 62), Size = new Size(150, 25), Font = new Font("Microsoft YaHei UI", 9F), UseSystemPasswordChar = true };
 
-        Label lblRole = new() { Text = "权限：", Location = new Point(260, 65), AutoSize = true, Font = new Font("Microsoft YaHei UI", 9F) };
+        Label lblRole = new() { Text = "权限：", Location = new Point(285, 65), AutoSize = false, Size = new Size(65, 20), TextAlign = ContentAlignment.MiddleLeft, Font = new Font("Microsoft YaHei UI", 9F), BackColor = Color.Transparent };
         _cmbRole = new ComboBox
         {
-            Location = new Point(320, 62),
+            Location = new Point(355, 62),
             Size = new Size(150, 25),
             Font = new Font("Microsoft YaHei UI", 9F),
             DropDownStyle = ComboBoxStyle.DropDownList
         };
         _cmbRole.Items.AddRange(new object[] { BusinessConstants.ROLE_ADMIN, BusinessConstants.ROLE_USER });
 
-        _btnAdd = CreateButton("添加", 20, 100);
+        _btnAdd = CreateButton("添加", 15, 100);
         _btnAdd.Click += BtnAdd_Click;
-        _btnUpdate = CreateButton("修改", 110, 100);
+        _btnUpdate = CreateButton("修改", 105, 100);
         _btnUpdate.Click += BtnUpdate_Click;
-        _btnDelete = CreateButton("删除", 200, 100);
+        _btnDelete = CreateButton("删除", 195, 100);
         _btnDelete.Click += BtnDelete_Click;
-        _btnClear = CreateButton("清空", 290, 100);
+        _btnClear = CreateButton("清空", 285, 100);
         _btnClear.Click += (s, e) => ClearInput();
 
-        _grpInput.Controls.AddRange(new Control[] { lblUserName, _txtUserName, lblPassword, _txtPassword, lblConfirm, _txtConfirmPassword, lblRole, _cmbRole, _btnAdd, _btnUpdate, _btnDelete, _btnClear });
+        _grpInput.Controls.AddRange(new Control[] { lblGrpTitle, lblUserName, _txtUserName, lblPassword, _txtPassword, lblConfirm, _txtConfirmPassword, lblRole, _cmbRole, _btnAdd, _btnUpdate, _btnDelete, _btnClear });
 
-        // 返回按钮
-        _btnBack = CreateButton("返回", 560, 440);
+        // 返回按钮（Y=430 适配 ClientSize 464，避免超出底部）
+        _btnBack = CreateButton("返回", 560, 430);
         _btnBack.Click += (s, e) => Close();
 
         Controls.AddRange(new Control[] { _dgvUsers, _grpInput, _btnBack });
@@ -132,6 +144,7 @@ public class UserForm : Form
     /// </summary>
     private void DgvUsers_SelectionChanged(object sender, EventArgs e)
     {
+        // 数据绑定切换时 DataBoundItem 可能为 null，类型匹配失败时静默跳过
         if (_dgvUsers.CurrentRow?.DataBoundItem is User user)
         {
             _txtUserName.Text = user.UserName;
@@ -189,6 +202,7 @@ public class UserForm : Form
         string password = _txtPassword.Text;
         string confirmPassword = _txtConfirmPassword.Text;
         // BLL 的 UpdateUser 不校验确认密码，需在 UI 层校验一致性
+        // 密码为空时表示不修改密码，跳过一致性校验；非空时才比对两次输入
         if (!string.IsNullOrEmpty(password) && password != confirmPassword)
         {
             MessageBox.Show("两次输入的密码不一致", "操作失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -230,7 +244,7 @@ public class UserForm : Form
 
         try
         {
-            // 删除当前登录用户由 BLL 抛 BusinessException 处理
+            // 传入当前登录用户名，BLL 层校验禁止删除自身账号，避免误删导致当前会话失效
             _userService.DeleteUser(user.UserName, _currentUser.UserName);
             MessageBox.Show("删除成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             ClearInput();
@@ -257,6 +271,7 @@ public class UserForm : Form
         _cmbRole.SelectedIndex = -1;
         _txtUserName.ReadOnly = false;
         _txtUserName.BackColor = Color.White;
+        // 清除列表选中状态，避免选中行高亮与已清空的输入框内容不一致
         if (_dgvUsers.CurrentRow != null)
         {
             _dgvUsers.ClearSelection();

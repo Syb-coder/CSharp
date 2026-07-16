@@ -8,6 +8,7 @@ public class User
     /// <summary>用户名（主键）</summary>
     public string UserName { get; set; }
 
+    // 存储的是 SHA-256 哈希值而非明文，即使数据库泄露也无法直接还原密码
     /// <summary>用户密码（SHA-256 哈希值）</summary>
     public string UserPassword { get; set; }
 

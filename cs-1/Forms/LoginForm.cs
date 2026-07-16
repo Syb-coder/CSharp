@@ -78,6 +78,7 @@ public class LoginForm : Form
             Font = new Font("Microsoft YaHei UI", 10F),
             Size = new Size(200, 25),
             Location = new Point(145, 133),
+            // 使用系统密码字符掩码，防止旁人窥屏获取明文密码
             UseSystemPasswordChar = true
         };
 
@@ -97,6 +98,7 @@ public class LoginForm : Form
             Font = new Font("Microsoft YaHei UI", 10F),
             Size = new Size(200, 25),
             Location = new Point(145, 173),
+            // DropDownList 禁止手动输入，限定只能选择预设身份，避免非法角色值
             DropDownStyle = ComboBoxStyle.DropDownList
         };
         _cmbRole.Items.AddRange(new object[] { "管理员", "普通用户" });
@@ -138,7 +140,7 @@ public class LoginForm : Form
             _btnLogin, _btnExit
         });
 
-        // 窗体关闭时终止应用
+        // 登录窗体是应用入口，关闭它意味着用户退出系统，故直接终止进程
         FormClosed += (s, e) => Application.Exit();
     }
 
@@ -150,23 +152,44 @@ public class LoginForm : Form
         try
         {
             string userName = _txtUserName.Text.Trim();
+            // 密码不做 Trim，因为密码中可能合法包含首尾空格
             string password = _txtPassword.Text;
             string role = _cmbRole.SelectedItem?.ToString();
 
             User user = _userService.Login(userName, password, role);
 
-            // 验证通过，隐藏登录窗体，显示主窗体
+            // 验证通过，隐藏登录窗体（而非关闭），保留实例以便主窗体关闭后再处理
             Hide();
             MainForm mainForm = new(user);
-            mainForm.FormClosed += (s, e) => Close();
+            // 主窗体关闭时根据关闭方式决定后续行为：
+            // - 退出登录（IsLogout=true）：重新显示登录界面，支持切换账号
+            // - 窗体关闭按钮（IsLogout=false）：关闭登录窗体，触发 Application.Exit() 退出应用
+            mainForm.FormClosed += (s, e) =>
+            {
+                if (mainForm.IsLogout)
+                {
+                    // 退出登录：重新显示登录界面并清空输入，等待重新登录
+                    Show();
+                    _txtPassword.Clear();
+                    _txtUserName.SelectAll();
+                    _txtUserName.Focus();
+                }
+                else
+                {
+                    // 退出应用：关闭登录窗体，触发 FormClosed → Application.Exit()
+                    Close();
+                }
+            };
             mainForm.Show();
         }
+        // BusinessException 是业务层校验失败（如密码错误、角色不匹配），属于用户可纠正的错误
         catch (BusinessException ex)
         {
             MessageBox.Show(ex.Message, "登录失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             _txtPassword.Clear();
             _txtPassword.Focus();
         }
+        // Exception 捕获系统级错误（如数据库连接失败），与业务错误区分提示
         catch (Exception ex)
         {
             MessageBox.Show($"数据库连接失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);

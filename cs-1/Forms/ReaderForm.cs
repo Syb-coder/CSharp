@@ -21,7 +21,7 @@ public class ReaderForm : Form
     private readonly Button _btnDelete;
     private readonly Button _btnClear;
     private readonly Button _btnBack;
-    private readonly GroupBox _grpInput;
+    private readonly Panel _grpInput;
     private readonly TextBox _txtReaderID;
     private readonly TextBox _txtReaderName;
     private readonly ComboBox _cmbSex;
@@ -45,121 +45,143 @@ public class ReaderForm : Form
         MaximizeBox = false;
         BackColor = Color.FromArgb(245, 247, 250);
 
-        // ===== 查询区域 =====
+        // ===== 查询区域：Label 宽度=AutoSize实际值（4字+冒号=100px, 2字+冒号=65px） =====
         Label lblSearchID = new()
         {
             Text = "读者编号：",
             Font = new Font("Microsoft YaHei UI", 9F),
             Location = new Point(15, 18),
-            AutoSize = true
+            AutoSize = false,
+            Size = new Size(100, 20),
+            TextAlign = ContentAlignment.MiddleLeft,
+            BackColor = Color.Transparent
         };
         _txtSearchID = new TextBox
         {
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(85, 15),
-            Size = new Size(120, 25)
+            Location = new Point(120, 15),
+            Size = new Size(110, 25)
         };
 
         Label lblSearchName = new()
         {
             Text = "姓名：",
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(225, 18),
-            AutoSize = true
+            Location = new Point(240, 18),
+            AutoSize = false,
+            Size = new Size(65, 20),
+            TextAlign = ContentAlignment.MiddleLeft,
+            BackColor = Color.Transparent
         };
         _txtSearchName = new TextBox
         {
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(270, 15),
-            Size = new Size(120, 25)
+            Location = new Point(310, 15),
+            Size = new Size(110, 25)
         };
 
         Label lblSearchDept = new()
         {
             Text = "院系：",
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(410, 18),
-            AutoSize = true
+            Location = new Point(430, 18),
+            AutoSize = false,
+            Size = new Size(65, 20),
+            TextAlign = ContentAlignment.MiddleLeft,
+            BackColor = Color.Transparent
         };
         _txtSearchDepartment = new TextBox
         {
             Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(455, 15),
-            Size = new Size(120, 25)
+            Location = new Point(500, 15),
+            Size = new Size(110, 25)
         };
 
-        _btnSearch = CreateButton("查询", 600, 12);
+        _btnSearch = CreateButton("查询", 620, 12);
         _btnSearch.Click += (s, e) => LoadData();
 
         // ===== DataGridView 列表 =====
         _dgvReaders = new DataGridView
         {
             Location = new Point(15, 50),
-            Size = new Size(760, 220),
+            Size = new Size(780, 230),
             AllowUserToAddRows = false,
             AllowUserToDeleteRows = false,
             ReadOnly = true,
             SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None,
             BackgroundColor = Color.White,
-            BorderStyle = BorderStyle.FixedSingle
+            BorderStyle = BorderStyle.FixedSingle,
+            RowHeadersVisible = false
         };
         _dgvReaders.SelectionChanged += DgvReaders_SelectionChanged;
 
-        // ===== 输入区域 =====
-        _grpInput = new GroupBox
+        // ===== 输入区域（Panel 无圆角边框遮盖） =====
+        _grpInput = new Panel
+        {
+            BorderStyle = BorderStyle.FixedSingle,
+            BackColor = Color.FromArgb(245, 247, 250),
+            Location = new Point(15, 290),
+            Size = new Size(780, 170)
+        };
+        Label lblGrpTitle = new()
         {
             Text = "读者信息",
-            Font = new Font("Microsoft YaHei UI", 9F),
-            Location = new Point(15, 280),
-            Size = new Size(760, 170)
+            Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold),
+            ForeColor = Color.FromArgb(64, 158, 255),
+            Location = new Point(10, 5),
+            AutoSize = true,
+            BackColor = Color.Transparent
         };
 
-        Label lblID = new() { Text = "读者编号：", Location = new Point(15, 30), AutoSize = true, Font = new Font("Microsoft YaHei UI", 9F) };
-        _txtReaderID = new TextBox { Location = new Point(85, 27), Size = new Size(140, 25), Font = new Font("Microsoft YaHei UI", 9F) };
+        // 第一行：读者编号(100)、姓名(65)、性别(65) —— Label 宽度=AutoSize实际值
+        Label lblID = new() { Text = "读者编号：", Location = new Point(15, 30), AutoSize = false, Size = new Size(100, 20), TextAlign = ContentAlignment.MiddleLeft, Font = new Font("Microsoft YaHei UI", 9F), BackColor = Color.Transparent };
+        _txtReaderID = new TextBox { Location = new Point(120, 27), Size = new Size(130, 25), Font = new Font("Microsoft YaHei UI", 9F) };
 
-        Label lblName = new() { Text = "姓名：", Location = new Point(245, 30), AutoSize = true, Font = new Font("Microsoft YaHei UI", 9F) };
-        _txtReaderName = new TextBox { Location = new Point(290, 27), Size = new Size(140, 25), Font = new Font("Microsoft YaHei UI", 9F) };
+        Label lblName = new() { Text = "姓名：", Location = new Point(260, 30), AutoSize = false, Size = new Size(65, 20), TextAlign = ContentAlignment.MiddleLeft, Font = new Font("Microsoft YaHei UI", 9F), BackColor = Color.Transparent };
+        _txtReaderName = new TextBox { Location = new Point(330, 27), Size = new Size(130, 25), Font = new Font("Microsoft YaHei UI", 9F) };
 
-        Label lblSex = new() { Text = "性别：", Location = new Point(450, 30), AutoSize = true, Font = new Font("Microsoft YaHei UI", 9F) };
+        Label lblSex = new() { Text = "性别：", Location = new Point(470, 30), AutoSize = false, Size = new Size(65, 20), TextAlign = ContentAlignment.MiddleLeft, Font = new Font("Microsoft YaHei UI", 9F), BackColor = Color.Transparent };
+        // 性别使用 ComboBox 而非 TextBox：通过枚举值约束输入，避免用户填入非法性别文本
         _cmbSex = new ComboBox
         {
-            Location = new Point(495, 27),
+            Location = new Point(540, 27),
             Size = new Size(90, 25),
             Font = new Font("Microsoft YaHei UI", 9F),
-            // 仅允许从下拉项中选择，禁止自由输入，确保性别取值为“男”或“女”
             DropDownStyle = ComboBoxStyle.DropDownList
         };
         _cmbSex.Items.AddRange(new object[] { "男", "女" });
 
-        Label lblPhone = new() { Text = "联系电话：", Location = new Point(15, 70), AutoSize = true, Font = new Font("Microsoft YaHei UI", 9F) };
-        _txtPhone = new TextBox { Location = new Point(85, 67), Size = new Size(140, 25), Font = new Font("Microsoft YaHei UI", 9F) };
+        // 第二行：联系电话(100)、所在院系(100)、注册日期(100) —— Label 宽度=AutoSize实际值
+        Label lblPhone = new() { Text = "联系电话：", Location = new Point(15, 70), AutoSize = false, Size = new Size(100, 20), TextAlign = ContentAlignment.MiddleLeft, Font = new Font("Microsoft YaHei UI", 9F), BackColor = Color.Transparent };
+        _txtPhone = new TextBox { Location = new Point(120, 67), Size = new Size(130, 25), Font = new Font("Microsoft YaHei UI", 9F) };
 
-        Label lblDept = new() { Text = "所在院系：", Location = new Point(245, 70), AutoSize = true, Font = new Font("Microsoft YaHei UI", 9F) };
-        _txtDepartment = new TextBox { Location = new Point(320, 67), Size = new Size(140, 25), Font = new Font("Microsoft YaHei UI", 9F) };
+        Label lblDept = new() { Text = "所在院系：", Location = new Point(260, 70), AutoSize = false, Size = new Size(100, 20), TextAlign = ContentAlignment.MiddleLeft, Font = new Font("Microsoft YaHei UI", 9F), BackColor = Color.Transparent };
+        _txtDepartment = new TextBox { Location = new Point(365, 67), Size = new Size(130, 25), Font = new Font("Microsoft YaHei UI", 9F) };
 
-        Label lblDate = new() { Text = "注册日期：", Location = new Point(480, 70), AutoSize = true, Font = new Font("Microsoft YaHei UI", 9F) };
+        Label lblDate = new() { Text = "注册日期：", Location = new Point(505, 70), AutoSize = false, Size = new Size(100, 20), TextAlign = ContentAlignment.MiddleLeft, Font = new Font("Microsoft YaHei UI", 9F), BackColor = Color.Transparent };
         _dtpRegisterDate = new DateTimePicker
         {
-            Location = new Point(550, 67),
+            Location = new Point(610, 67),
             Size = new Size(150, 25),
             Font = new Font("Microsoft YaHei UI", 9F),
             Format = DateTimePickerFormat.Short,
-            // 启用复选框以表示可空的注册日期：未勾选视为未设置
+            // ShowCheckBox 配合可空的注册日期字段：勾选表示有值，取消勾选表示未设置
             ShowCheckBox = true
         };
 
-        _btnAdd = CreateButton("添加", 85, 110);
+        _btnAdd = CreateButton("添加", 100, 110);
         _btnAdd.Click += BtnAdd_Click;
-        _btnUpdate = CreateButton("修改", 185, 110);
+        _btnUpdate = CreateButton("修改", 200, 110);
         _btnUpdate.Click += BtnUpdate_Click;
-        _btnDelete = CreateButton("删除", 285, 110);
+        _btnDelete = CreateButton("删除", 300, 110);
         _btnDelete.Click += BtnDelete_Click;
-        _btnClear = CreateButton("清空", 385, 110);
+        _btnClear = CreateButton("清空", 400, 110);
         _btnClear.Click += (s, e) => ClearInput();
 
         _grpInput.Controls.AddRange(new Control[]
         {
+            lblGrpTitle,
             lblID, _txtReaderID,
             lblName, _txtReaderName,
             lblSex, _cmbSex,
@@ -209,15 +231,21 @@ public class ReaderForm : Form
                 : _readerService.GetAllReaders();
 
             _dgvReaders.DataSource = readers;
-            // 设置中文列标题
             _dgvReaders.Columns[nameof(Reader.ReaderID)].HeaderText = "读者编号";
+            _dgvReaders.Columns[nameof(Reader.ReaderID)].Width = 90;
             _dgvReaders.Columns[nameof(Reader.ReaderName)].HeaderText = "姓名";
+            _dgvReaders.Columns[nameof(Reader.ReaderName)].Width = 80;
             _dgvReaders.Columns[nameof(Reader.ReaderSex)].HeaderText = "性别";
+            _dgvReaders.Columns[nameof(Reader.ReaderSex)].Width = 60;
             _dgvReaders.Columns[nameof(Reader.Phone)].HeaderText = "联系电话";
+            _dgvReaders.Columns[nameof(Reader.Phone)].Width = 120;
             _dgvReaders.Columns[nameof(Reader.Department)].HeaderText = "所在院系";
+            _dgvReaders.Columns[nameof(Reader.Department)].Width = 150;
             _dgvReaders.Columns[nameof(Reader.RegisterDate)].HeaderText = "注册日期";
-            // 注册日期列格式化，空值显示为空字符串
+            _dgvReaders.Columns[nameof(Reader.RegisterDate)].Width = 100;
+
             _dgvReaders.Columns[nameof(Reader.RegisterDate)].DefaultCellStyle.Format = "yyyy-MM-dd";
+            // 注册日期为 null 时显示为空字符串，而非默认的 "null" 文字
             _dgvReaders.Columns[nameof(Reader.RegisterDate)].DefaultCellStyle.NullValue = string.Empty;
         }
         catch (Exception ex)
@@ -231,6 +259,7 @@ public class ReaderForm : Form
     /// </summary>
     private void DgvReaders_SelectionChanged(object sender, EventArgs e)
     {
+        // 数据绑定切换瞬间 DataBoundItem 可能为 null，类型匹配失败时静默跳过，避免空引用异常
         if (_dgvReaders.CurrentRow?.DataBoundItem is Reader reader)
         {
             _txtReaderID.Text = reader.ReaderID;
@@ -372,6 +401,7 @@ public class ReaderForm : Form
         _dtpRegisterDate.Checked = false;
         _txtReaderID.ReadOnly = false;
         _txtReaderID.BackColor = Color.White;
+        // 清除列表选中状态，避免选中行高亮与已清空的输入框内容不一致
         if (_dgvReaders.CurrentRow != null)
         {
             _dgvReaders.ClearSelection();

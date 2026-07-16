@@ -37,6 +37,7 @@ public class ReaderDAL
     /// <returns>读者列表</returns>
     public List<Reader> SearchReaders(string readerID, string readerName, string department)
     {
+        // 与 BookDAL.SearchBooks 相同的 "@param IS NULL OR ..." 模式，避免动态拼接 SQL
         const string sql = @"
             SELECT readerID, readerName, readerSex, phone, department, registerDate
             FROM tbl_Reader
@@ -51,6 +52,7 @@ public class ReaderDAL
         {
             Value = string.IsNullOrWhiteSpace(readerID) ? DBNull.Value : readerID
         });
+        // readerName 字段长度为 8（对应中文姓名最多约 4 个汉字），SQL 参数长度需与表定义一致以避免截断
         cmd.Parameters.Add(new SqlParameter("@readerName", SqlDbType.NVarChar, 8)
         {
             Value = string.IsNullOrWhiteSpace(readerName) ? DBNull.Value : $"%{readerName}%"
@@ -106,7 +108,7 @@ public class ReaderDAL
         {
             return cmd.ExecuteNonQuery() > 0;
         }
-        catch (SqlException ex) when (ex.Number == 2627)
+        catch (SqlException ex) when (ex.Number == 2627) // 主键冲突：readerID 已存在
         {
             return false;
         }
@@ -166,21 +168,30 @@ public class ReaderDAL
     /// </summary>
     private static void AddReaderParameters(SqlCommand cmd, Reader reader)
     {
-        cmd.Parameters.Add(new SqlParameter("@readerID", SqlDbType.NVarChar, 20) { Value = reader.ReaderID });
-        cmd.Parameters.Add(new SqlParameter("@readerName", SqlDbType.NVarChar, 8) { Value = reader.ReaderName });
-        cmd.Parameters.Add(new SqlParameter("@readerSex", SqlDbType.NVarChar, 2) { Value = reader.ReaderSex });
-        cmd.Parameters.Add(new SqlParameter("@phone", SqlDbType.NVarChar, 15)
+        SafeAddParam(cmd, "@readerID", SqlDbType.NVarChar, 20, reader.ReaderID);
+        SafeAddParam(cmd, "@readerName", SqlDbType.NVarChar, 8, reader.ReaderName);
+        SafeAddParam(cmd, "@readerSex", SqlDbType.NVarChar, 2, reader.ReaderSex);
+        SafeAddParam(cmd, "@phone", SqlDbType.NVarChar, 15,
+            string.IsNullOrEmpty(reader.Phone) ? DBNull.Value : reader.Phone);
+        SafeAddParam(cmd, "@department", SqlDbType.NVarChar, 20,
+            string.IsNullOrEmpty(reader.Department) ? DBNull.Value : reader.Department);
+        SafeAddParam(cmd, "@registerDate", SqlDbType.Date, 0,
+            reader.RegisterDate.HasValue ? reader.RegisterDate.Value : DBNull.Value);
+    }
+
+    /// <summary>
+    /// 安全添加参数：若同名参数已存在则更新值，否则新增
+    /// </summary>
+    private static void SafeAddParam(SqlCommand cmd, string name, SqlDbType type, int size, object value)
+    {
+        if (cmd.Parameters.Contains(name))
         {
-            Value = string.IsNullOrEmpty(reader.Phone) ? DBNull.Value : reader.Phone
-        });
-        cmd.Parameters.Add(new SqlParameter("@department", SqlDbType.NVarChar, 20)
+            cmd.Parameters[name].Value = value ?? DBNull.Value;
+        }
+        else
         {
-            Value = string.IsNullOrEmpty(reader.Department) ? DBNull.Value : reader.Department
-        });
-        cmd.Parameters.Add(new SqlParameter("@registerDate", SqlDbType.Date)
-        {
-            Value = reader.RegisterDate.HasValue ? reader.RegisterDate.Value : DBNull.Value
-        });
+            cmd.Parameters.Add(new SqlParameter(name, type, size) { Value = value ?? DBNull.Value });
+        }
     }
 
     /// <summary>
