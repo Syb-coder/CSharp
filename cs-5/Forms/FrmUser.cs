@@ -1,6 +1,7 @@
 using LibrarySys.BLL;
 using LibrarySys.Common;
 using LibrarySys.Models;
+using System.ComponentModel;
 
 namespace LibrarySys.Forms;
 
@@ -8,7 +9,7 @@ namespace LibrarySys.Forms;
 /// 用户管理窗体
 /// 固定坐标布局：查询区(顶部) → DataGridView(中间) → 编辑区(底部)
 /// </summary>
-public class FrmUser : Form
+public partial class FrmUser : Form
 {
     private readonly UserBiz _biz = new();
     private readonly UserInfo _currentUser;
@@ -25,7 +26,8 @@ public class FrmUser : Form
     {
         // 无参构造：非管理员模式，所有编辑按钮不可用
         _canEdit = false;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         Load += (_, _) => LoadData();
     }
 
@@ -33,12 +35,18 @@ public class FrmUser : Form
     {
         _currentUser = currentUser;
         _canEdit = currentUser.UserPurview == BusinessConstants.ROLE_ADMIN;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         Load += (_, _) => LoadData();
     }
 
-    private void InitializeUI()
+    private void BuildUI()
     {
+        // 设计器模式下跳过：设计器已在 InitializeComponent 中创建控件骨架
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+        // 运行时：清除 InitializeComponent 创建的骨架控件，重新完整构建
+        Controls.Clear();
+
         DoubleBuffered = true;
         Text = "用户管理";
         StartPosition = FormStartPosition.CenterScreen;
@@ -59,7 +67,7 @@ public class FrmUser : Form
         _cboQueryPurview.SelectedIndex = 0;
 
         // ===== 顶部查询区（固定坐标） =====
-        GroupBox grpQuery = new()
+        GroupBox grpQuery = new GroupBox()
         {
             Text = "查询条件",
             Location = new Point(0, 0),
@@ -85,7 +93,7 @@ public class FrmUser : Form
         _dgv.SelectionChanged += (_, _) => BindEditForm();
 
         // ===== 底部编辑区（固定坐标） =====
-        GroupBox grpEdit = new()
+        GroupBox grpEdit = new GroupBox()
         {
             Text = "用户信息",
             Dock = DockStyle.Bottom,

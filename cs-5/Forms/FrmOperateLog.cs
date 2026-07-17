@@ -1,13 +1,14 @@
 using LibrarySys.BLL;
 using LibrarySys.Common;
 using LibrarySys.Models;
+using System.ComponentModel;
 
 namespace LibrarySys.Forms;
 
 /// <summary>
 /// 操作日志查看窗体：支持时间范围、操作类型、用户名筛选
 /// </summary>
-public class FrmOperateLog : Form
+public partial class FrmOperateLog : Form
 {
     private readonly UserInfo _currentUser;
     private readonly LogBiz _biz = new();
@@ -19,16 +20,29 @@ public class FrmOperateLog : Form
     private Button _btnSearch;
     private Button _btnClear;
 
+    /// <summary>无参构造，仅供 VS 设计器使用</summary>
+    public FrmOperateLog()
+    {
+        InitializeComponent();
+        BuildUI();
+    }
+
     public FrmOperateLog(UserInfo currentUser)
     {
         _currentUser = currentUser;
         Text = "操作日志";
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         Load += (_, _) => LoadData();
     }
 
-    private void InitializeUI()
+    private void BuildUI()
     {
+        // 设计器模式下跳过：设计器已在 InitializeComponent 中创建控件骨架
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+        // 运行时：清除 InitializeComponent 创建的骨架控件，重新完整构建
+        Controls.Clear();
+
         DoubleBuffered = true;
         BackColor = Color.FromArgb(240, 242, 245);
         Font = UiHelper.DefaultFont;

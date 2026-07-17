@@ -1,13 +1,14 @@
 using LibrarySys.BLL;
 using LibrarySys.Common;
 using LibrarySys.Models;
+using System.ComponentModel;
 
 namespace LibrarySys.Forms;
 
 /// <summary>
 /// 预约管理窗体：预约登记、通知取书、取消预约、查询
 /// </summary>
-public class FrmReservation : Form
+public partial class FrmReservation : Form
 {
     private readonly UserInfo _currentUser;
     private readonly ReservationBiz _biz = new();
@@ -21,16 +22,29 @@ public class FrmReservation : Form
     private Button _btnCancel;
     private Button _btnRefresh;
 
+    /// <summary>无参构造，仅供 VS 设计器使用</summary>
+    public FrmReservation()
+    {
+        InitializeComponent();
+        BuildUI();
+    }
+
     public FrmReservation(UserInfo currentUser)
     {
         _currentUser = currentUser;
         Text = "预约管理";
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         Load += (_, _) => LoadData();
     }
 
-    private void InitializeUI()
+    private void BuildUI()
     {
+        // 设计器模式下跳过：设计器已在 InitializeComponent 中创建控件骨架
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+        // 运行时：清除 InitializeComponent 创建的骨架控件，重新完整构建
+        Controls.Clear();
+
         DoubleBuffered = true;
         BackColor = Color.FromArgb(240, 242, 245);
         Font = UiHelper.DefaultFont;
@@ -113,7 +127,8 @@ public class FrmReservation : Form
         bottomPanel.Controls.AddRange(new Control[] { _btnReserve, _btnNotify, _btnCancel });
 
         // 权限控制：普通用户可预约登记和取消预约，但通知取书仅管理员可操作
-        if (_currentUser.UserPurview == BusinessConstants.ROLE_USER)
+        // 设计器无参构造时 _currentUser 为 null，跳过权限控制
+        if (_currentUser != null && _currentUser.UserPurview == BusinessConstants.ROLE_USER)
         {
             _btnNotify.Enabled = false;
         }

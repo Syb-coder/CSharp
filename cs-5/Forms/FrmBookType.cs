@@ -1,6 +1,7 @@
 using LibrarySys.BLL;
 using LibrarySys.Common;
 using LibrarySys.Models;
+using System.ComponentModel;
 
 namespace LibrarySys.Forms;
 
@@ -8,7 +9,7 @@ namespace LibrarySys.Forms;
 /// 图书类型管理窗体
 /// 固定坐标布局：DataGridView(中间) → 编辑区(底部)，无查询区
 /// </summary>
-public class FrmBookType : Form
+public partial class FrmBookType : Form
 {
     private readonly BookTypeBiz _biz = new();
     private readonly UserInfo _currentUser;
@@ -21,7 +22,8 @@ public class FrmBookType : Form
     public FrmBookType()
     {
         _canEdit = true;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         Load += (_, _) => LoadData();
     }
 
@@ -29,12 +31,18 @@ public class FrmBookType : Form
     {
         _currentUser = currentUser;
         _canEdit = currentUser.UserPurview == BusinessConstants.ROLE_ADMIN;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         Load += (_, _) => LoadData();
     }
 
-    private void InitializeUI()
+    private void BuildUI()
     {
+        // 设计器模式下跳过：设计器已在 InitializeComponent 中创建控件骨架
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+        // 运行时：清除 InitializeComponent 创建的骨架控件，重新完整构建
+        Controls.Clear();
+
         DoubleBuffered = true;
         Text = "图书类型管理";
         StartPosition = FormStartPosition.CenterScreen;
@@ -46,7 +54,7 @@ public class FrmBookType : Form
         _txtTypeName = UiHelper.CreateTextBox();
 
         // ===== 底部编辑区（固定坐标） =====
-        GroupBox grpEdit = new()
+        GroupBox grpEdit = new GroupBox()
         {
             Text = "类型信息",
             Dock = DockStyle.Bottom,

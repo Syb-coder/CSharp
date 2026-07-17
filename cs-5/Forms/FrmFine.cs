@@ -1,6 +1,7 @@
 using LibrarySys.BLL;
 using LibrarySys.Common;
 using LibrarySys.Models;
+using System.ComponentModel;
 
 namespace LibrarySys.Forms;
 
@@ -8,7 +9,7 @@ namespace LibrarySys.Forms;
 /// 罚款管理窗体（查询罚款记录、登记缴费）
 /// 固定坐标布局：查询区(顶部) → DataGridView(中间) → 操作区(底部，仅按钮)
 /// </summary>
-public class FrmFine : Form
+public partial class FrmFine : Form
 {
     private readonly FineBiz _biz = new();
     private readonly UserInfo _currentUser;
@@ -23,7 +24,8 @@ public class FrmFine : Form
     public FrmFine()
     {
         _canEdit = true;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         Load += (_, _) => LoadData();
     }
 
@@ -31,12 +33,18 @@ public class FrmFine : Form
     {
         _currentUser = currentUser;
         _canEdit = currentUser.UserPurview == BusinessConstants.ROLE_ADMIN;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         Load += (_, _) => LoadData();
     }
 
-    private void InitializeUI()
+    private void BuildUI()
     {
+        // 设计器模式下跳过：设计器已在 InitializeComponent 中创建控件骨架
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+        // 运行时：清除 InitializeComponent 创建的骨架控件，重新完整构建
+        Controls.Clear();
+
         DoubleBuffered = true;
         Text = "罚款管理";
         StartPosition = FormStartPosition.CenterScreen;
@@ -50,7 +58,7 @@ public class FrmFine : Form
         _cboQueryStatus.Items.AddRange(new object[] { "", BusinessConstants.FINE_UNPAID, BusinessConstants.FINE_PAID });
 
         // ===== 顶部查询区（固定坐标） =====
-        GroupBox grpQuery = new()
+        GroupBox grpQuery = new GroupBox()
         {
             Text = "查询条件",
             Location = new Point(0, 0),
@@ -76,7 +84,7 @@ public class FrmFine : Form
         _dgv.SelectionChanged += (_, _) => SelectionChanged();
 
         // ===== 底部操作区（仅按钮，无表单） =====
-        GroupBox grpAction = new()
+        GroupBox grpAction = new GroupBox()
         {
             Text = "操作",
             Dock = DockStyle.Bottom,

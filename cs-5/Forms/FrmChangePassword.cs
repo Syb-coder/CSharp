@@ -1,27 +1,41 @@
 using LibrarySys.BLL;
 using LibrarySys.Common;
 using LibrarySys.Models;
+using System.ComponentModel;
 
 namespace LibrarySys.Forms;
 
 /// <summary>
 /// 修改密码窗体：固定坐标布局，Label 测量后固定宽度，DPI 安全
 /// </summary>
-public class FrmChangePassword : Form
+public partial class FrmChangePassword : Form
 {
     private readonly UserBiz _biz = new();
     private readonly UserInfo _currentUser;
 
     private TextBox _txtOld, _txtNew, _txtConfirm;
 
+    /// <summary>无参构造，仅供 VS 设计器使用</summary>
+    public FrmChangePassword()
+    {
+        InitializeComponent();
+        BuildUI();
+    }
+
     public FrmChangePassword(UserInfo currentUser)
     {
         _currentUser = currentUser;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
     }
 
-    private void InitializeUI()
+    private void BuildUI()
     {
+        // 设计器模式下跳过：设计器已在 InitializeComponent 中创建控件骨架
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+        // 运行时：清除 InitializeComponent 创建的骨架控件，重新完整构建
+        Controls.Clear();
+
         DoubleBuffered = true;
         Text = "修改密码";
         StartPosition = FormStartPosition.CenterScreen;
@@ -31,9 +45,9 @@ public class FrmChangePassword : Form
         Font = UiHelper.DefaultFont;
 
         // 标题
-        Label lblTitle = new()
+        Label lblTitle = new Label()
         {
-            Text = $"当前用户：{_currentUser.UserName}",
+            Text = $"当前用户：{_currentUser?.UserName ?? "（设计器预览）"}",
             AutoSize = false,
             TextAlign = ContentAlignment.MiddleLeft,
             Location = new Point(75, 15),

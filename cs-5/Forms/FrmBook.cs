@@ -1,6 +1,7 @@
 using LibrarySys.BLL;
 using LibrarySys.Common;
 using LibrarySys.Models;
+using System.ComponentModel;
 
 namespace LibrarySys.Forms;
 
@@ -9,7 +10,7 @@ namespace LibrarySys.Forms;
 /// 固定坐标布局：查询区(顶部) → DataGridView(中间) → 编辑区(底部)
 /// 极其保守的尺寸参数，DpiUnaware 模式下跨电脑零遮挡
 /// </summary>
-public class FrmBook : Form
+public partial class FrmBook : Form
 {
     private readonly BookBiz _biz = new();
     private readonly BookTypeBiz _typeBiz = new();
@@ -27,7 +28,8 @@ public class FrmBook : Form
     public FrmBook()
     {
         _canEdit = true;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         LoadTypeCombo();
         Load += (_, _) => LoadData();
     }
@@ -36,19 +38,23 @@ public class FrmBook : Form
     {
         _currentUser = currentUser;
         _canEdit = currentUser.UserPurview == BusinessConstants.ROLE_ADMIN;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         LoadTypeCombo();
         Load += (_, _) => LoadData();
     }
 
-    private void InitializeUI()
+    /// <summary>
+    /// 构建所有控件（控件创建、布局、事件绑定）
+    /// 放在 InitializeComponent 之外，因为 VS 设计器的 CodeDom 解析器无法处理
+    /// UiHelper 工厂调用、lambda、if 等复杂语句
+    /// </summary>
+    private void BuildUI()
     {
-        DoubleBuffered = true;
-        Text = "图书信息管理";
-        StartPosition = FormStartPosition.CenterScreen;
-        ClientSize = new Size(1150, 700);
-        MinimumSize = new Size(1100, 680);
-        Font = UiHelper.DefaultFont;
+        // 设计器模式下跳过：设计器已在 InitializeComponent 中创建控件骨架
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+        // 运行时：清除 InitializeComponent 创建的骨架控件，重新完整构建
+        Controls.Clear();
 
         _txtBookId = UiHelper.CreateTextBox();
         _txtBookName = UiHelper.CreateTextBox();
@@ -65,9 +71,7 @@ public class FrmBook : Form
         _txtQueryPub = UiHelper.CreateTextBox();
 
         // ===== 顶部查询区 =====
-        // GroupBox 标题栏约 20px，内容区高度 = Height - 20
-        // 按钮 y=72+32=104，需 Height ≥ 104+20=124
-        GroupBox grpQuery = new()
+        GroupBox grpQuery = new GroupBox
         {
             Text = "查询条件",
             Dock = DockStyle.Top,
@@ -86,15 +90,13 @@ public class FrmBook : Form
         btnShowAll.Click += (_, _) => DoShowAll();
         UiHelper.LayoutButtons(grpQuery.Controls, new[] { btnQuery, btnShowAll }, 20, 72);
 
-        // ===== DataGridView（手动定位，不依赖 Dock，避免嵌入窗体时布局错乱） =====
+        // ===== DataGridView =====
         _dgv = new DataGridView();
         UiHelper.StyleDataGridView(_dgv);
-        _dgv.SelectionChanged += (_, _) => BindEditForm();
+        _dgv.SelectionChanged += (_, _) => { try { BindEditForm(); } catch { } };
 
         // ===== 底部编辑区 =====
-        // GroupBox 标题栏约 20px，内容区高度 = Height - 20
-        // 按钮 y=140+32=172，需 Height ≥ 172+20=192
-        GroupBox grpEdit = new()
+        GroupBox grpEdit = new GroupBox
         {
             Text = "图书信息",
             Dock = DockStyle.Bottom,
@@ -129,12 +131,15 @@ public class FrmBook : Form
         Controls.Add(grpQuery);
         Controls.Add(_dgv);
 
-        // 手动控制 DataGridView 位置，确保在 grpQuery 和 grpEdit 之间
-        // 嵌入窗体时 WinForms Dock 布局可能异常，手动定位更可靠
         Layout += (_, _) =>
         {
-            _dgv.Location = new Point(0, grpQuery.Bottom);
-            _dgv.Size = new Size(ClientSize.Width, grpEdit.Top - grpQuery.Bottom);
+            if (_dgv == null || grpQuery == null || grpEdit == null) return;
+            try
+            {
+                _dgv.Location = new Point(0, grpQuery.Bottom);
+                _dgv.Size = new Size(ClientSize.Width, grpEdit.Top - grpQuery.Bottom);
+            }
+            catch { }
         };
     }
 

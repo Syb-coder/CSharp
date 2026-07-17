@@ -1,6 +1,7 @@
 using LibrarySys.BLL;
 using LibrarySys.Common;
 using LibrarySys.Models;
+using System.ComponentModel;
 
 namespace LibrarySys.Forms;
 
@@ -8,7 +9,7 @@ namespace LibrarySys.Forms;
 /// 读者信息管理窗体
 /// 固定坐标布局：查询区(顶部) → DataGridView(中间) → 编辑区(底部)
 /// </summary>
-public class FrmReader : Form
+public partial class FrmReader : Form
 {
     private readonly ReaderBiz _biz = new();
     private readonly UserInfo _currentUser;
@@ -24,7 +25,8 @@ public class FrmReader : Form
     public FrmReader()
     {
         _canEdit = true;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         Load += (_, _) => LoadData();
     }
 
@@ -32,12 +34,18 @@ public class FrmReader : Form
     {
         _currentUser = currentUser;
         _canEdit = currentUser.UserPurview == BusinessConstants.ROLE_ADMIN;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         Load += (_, _) => LoadData();
     }
 
-    private void InitializeUI()
+    private void BuildUI()
     {
+        // 设计器模式下跳过：设计器已在 InitializeComponent 中创建控件骨架
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+        // 运行时：清除 InitializeComponent 创建的骨架控件，重新完整构建
+        Controls.Clear();
+
         DoubleBuffered = true;
         Text = "读者信息管理";
         StartPosition = FormStartPosition.CenterScreen;
@@ -58,7 +66,7 @@ public class FrmReader : Form
         _txtQueryName = UiHelper.CreateTextBox();
 
         // ===== 顶部查询区（固定坐标） =====
-        GroupBox grpQuery = new()
+        GroupBox grpQuery = new GroupBox()
         {
             Text = "查询条件",
             Location = new Point(0, 0),
@@ -84,7 +92,7 @@ public class FrmReader : Form
         _dgv.SelectionChanged += (_, _) => BindEditForm();
 
         // ===== 底部编辑区（固定坐标） =====
-        GroupBox grpEdit = new()
+        GroupBox grpEdit = new GroupBox()
         {
             Text = "读者信息",
             Dock = DockStyle.Bottom,

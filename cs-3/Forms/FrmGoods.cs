@@ -51,7 +51,7 @@ public class FrmGoods : Form
         _currentUser = currentUser;
 
         Text = "商品信息管理";
-        Size = new Size(950, 650);
+        Size = new Size(600, 800);
         StartPosition = FormStartPosition.CenterScreen;
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
@@ -61,49 +61,50 @@ public class FrmGoods : Form
 
         const int ctrlGap = 8;
 
-        // ===== 查询区 GroupBox =====
+        // ===== 查询区 GroupBox（两行布局：第一行条件，第二行按钮）=====
         GroupBox grpSearch = new()
         {
             Text = "查询条件",
             Font = labelFont,
-            Size = new Size(914, 55),
-            Location = new Point(10, 5)
+            Size = new Size(560, 85),
+            Location = new Point(15, 5)
         };
 
         const int sMargin = 15;
-        const int sRowY = 22;
+        const int sRow1Y = 22;
+        const int sRow2Y = 52;
 
-        Label lblSearchName = UiHelper.CreateLabel("商品名：", sMargin, sRowY, labelFont);
+        Label lblSearchName = UiHelper.CreateLabel("商品名：", sMargin, sRow1Y, labelFont);
         _txtSearchName = new TextBox
         {
             Font = labelFont,
-            Size = new Size(140, CtrlHeight),
-            Location = new Point(UiHelper.NextX(lblSearchName), sRowY - 3)
+            Size = new Size(120, CtrlHeight),
+            Location = new Point(UiHelper.NextX(lblSearchName), sRow1Y - 3)
         };
 
         int sCol2X = _txtSearchName.Right + ctrlGap;
-        Label lblSearchCategory = UiHelper.CreateLabel("类别：", sCol2X, sRowY, labelFont);
+        Label lblSearchCategory = UiHelper.CreateLabel("类别：", sCol2X, sRow1Y, labelFont);
         _cmbSearchCategory = new ComboBox
         {
             Font = labelFont,
-            Size = new Size(140, CtrlHeight),
-            Location = new Point(UiHelper.NextX(lblSearchCategory), sRowY - 3),
+            Size = new Size(120, CtrlHeight),
+            Location = new Point(UiHelper.NextX(lblSearchCategory), sRow1Y - 3),
             DropDownStyle = ComboBoxStyle.DropDownList
         };
 
         int sCol3X = _cmbSearchCategory.Right + ctrlGap;
-        Label lblSearchSupplier = UiHelper.CreateLabel("供货商：", sCol3X, sRowY, labelFont);
+        Label lblSearchSupplier = UiHelper.CreateLabel("供货商：", sCol3X, sRow1Y, labelFont);
         _cmbSearchSupplier = new ComboBox
         {
             Font = labelFont,
-            Size = new Size(140, CtrlHeight),
-            Location = new Point(UiHelper.NextX(lblSearchSupplier), sRowY - 3),
+            Size = new Size(120, CtrlHeight),
+            Location = new Point(UiHelper.NextX(lblSearchSupplier), sRow1Y - 3),
             DropDownStyle = ComboBoxStyle.DropDownList
         };
 
-        Button btnSearch = UiHelper.CreateButton("查询", _cmbSearchSupplier.Right + ctrlGap, sRowY - 5, labelFont);
+        Button btnSearch = UiHelper.CreateButton("查询", sMargin, sRow2Y - 5, labelFont);
         btnSearch.Click += BtnSearch_Click;
-        Button btnExport = UiHelper.CreateButton("导出", btnSearch.Right + 10, sRowY - 5, labelFont);
+        Button btnExport = UiHelper.CreateButton("导出", btnSearch.Right + 10, sRow2Y - 5, labelFont);
         btnExport.Click += BtnExport_Click;
 
         grpSearch.Controls.AddRange(new Control[]
@@ -118,8 +119,8 @@ public class FrmGoods : Form
         _dgvGoods = new DataGridView
         {
             Font = labelFont,
-            Size = new Size(914, 290),
-            Location = new Point(10, 65),
+            Size = new Size(560, 310),
+            Location = new Point(15, 95),
             AutoGenerateColumns = false,
             SelectionMode = DataGridViewSelectionMode.FullRowSelect,
             MultiSelect = false,
@@ -134,110 +135,118 @@ public class FrmGoods : Form
         _dgvGoods.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft YaHei UI", 9F, FontStyle.Bold);
         _dgvGoods.Columns.AddRange(new DataGridViewColumn[]
         {
-            new DataGridViewTextBoxColumn { Name = "ColProductID", HeaderText = "商品编号", DataPropertyName = "ProductID", Width = 70 },
-            new DataGridViewTextBoxColumn { Name = "ColProductName", HeaderText = "商品名称", DataPropertyName = "ProductName", Width = 150 },
-            new DataGridViewTextBoxColumn { Name = "ColCategoryName", HeaderText = "类别", DataPropertyName = "CategoryName", Width = 80 },
-            new DataGridViewTextBoxColumn { Name = "ColUnitPrice", HeaderText = "单价", DataPropertyName = "UnitPrice", Width = 80 },
-            new DataGridViewTextBoxColumn { Name = "ColOrigin", HeaderText = "产地", DataPropertyName = "Origin", Width = 100 },
-            new DataGridViewTextBoxColumn { Name = "ColProduceDate", HeaderText = "生产日期", DataPropertyName = "ProduceDate", Width = 100 },
-            new DataGridViewTextBoxColumn { Name = "ColStockQty", HeaderText = "库存", DataPropertyName = "StockQty", Width = 70 },
+            new DataGridViewTextBoxColumn { Name = "ColProductID", HeaderText = "商品编号", DataPropertyName = "ProductID", Width = 60 },
+            new DataGridViewTextBoxColumn { Name = "ColProductName", HeaderText = "商品名称", DataPropertyName = "ProductName", Width = 110 },
+            new DataGridViewTextBoxColumn { Name = "ColCategoryName", HeaderText = "类别", DataPropertyName = "CategoryName", Width = 60 },
+            new DataGridViewTextBoxColumn { Name = "ColUnitPrice", HeaderText = "单价", DataPropertyName = "UnitPrice", Width = 60 },
+            new DataGridViewTextBoxColumn { Name = "ColOrigin", HeaderText = "产地", DataPropertyName = "Origin", Width = 70 },
+            new DataGridViewTextBoxColumn { Name = "ColProduceDate", HeaderText = "生产日期", DataPropertyName = "ProduceDate", Width = 80 },
+            new DataGridViewTextBoxColumn { Name = "ColStockQty", HeaderText = "库存", DataPropertyName = "StockQty", Width = 50 },
             new DataGridViewTextBoxColumn
             {
-                Name = "ColSupplierName", HeaderText = "供货商", DataPropertyName = "SupplierName", Width = 140,
+                Name = "ColSupplierName", HeaderText = "供货商", DataPropertyName = "SupplierName", Width = 60,
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             }
         });
         _dgvGoods.SelectionChanged += DgvGoods_SelectionChanged;
 
-        // ===== 输入区 GroupBox =====
+        // ===== 输入区 GroupBox（竖向排列：每行一个字段，Label 右边缘对齐）=====
         GroupBox grpInput = new()
         {
             Text = "商品信息",
             Font = labelFont,
-            Size = new Size(914, 180),
-            Location = new Point(10, 360)
+            Size = new Size(560, 305),
+            Location = new Point(15, 410)
         };
 
-        const int pMargin = 20;
-        const int pGap = ctrlGap;
+        // Label 右边缘统一对齐于 X=110，输入控件统一从 X=120 开始
+        const int labelRightX = 110;
+        const int inputX = 120;
+        const int inputWidth = 200;
+        const int rowGap = 30;
 
-        // 第1行：商品编号、商品名称、单价
-        const int pRow1Y = 30;
-        Label lblProductID = UiHelper.CreateLabel("商品编号：", pMargin, pRow1Y, labelFont);
+        // 第1行：商品编号
+        const int pRow1Y = 25;
+        Label lblProductID = UiHelper.CreateLabelRightAligned("商品编号：", labelRightX, pRow1Y, labelFont);
         _txtProductID = new TextBox
         {
             Font = labelFont,
-            Size = new Size(150, CtrlHeight),
-            Location = new Point(UiHelper.NextX(lblProductID), pRow1Y - 3),
+            Size = new Size(inputWidth, CtrlHeight),
+            Location = new Point(inputX, pRow1Y - 3),
             ReadOnly = true,
             BackColor = Color.FromArgb(240, 240, 240)
         };
 
-        int p1Col2X = _txtProductID.Right + pGap;
-        Label lblProductName = UiHelper.CreateLabel("商品名：", p1Col2X, pRow1Y, labelFont);
+        // 第2行：商品名称
+        const int pRow2Y = 25 + rowGap;
+        Label lblProductName = UiHelper.CreateLabelRightAligned("商品名称：", labelRightX, pRow2Y, labelFont);
         _txtProductName = new TextBox
         {
             Font = labelFont,
-            Size = new Size(150, CtrlHeight),
-            Location = new Point(UiHelper.NextX(lblProductName), pRow1Y - 3)
+            Size = new Size(inputWidth, CtrlHeight),
+            Location = new Point(inputX, pRow2Y - 3)
         };
 
-        int p1Col3X = _txtProductName.Right + pGap;
-        Label lblUnitPrice = UiHelper.CreateLabel("单价：", p1Col3X, pRow1Y, labelFont);
-        _txtUnitPrice = new TextBox
-        {
-            Font = labelFont,
-            Size = new Size(120, CtrlHeight),
-            Location = new Point(UiHelper.NextX(lblUnitPrice), pRow1Y - 3)
-        };
-
-        // 第2行：类别、供货商、库存
-        const int pRow2Y = 65;
-        Label lblCategory = UiHelper.CreateLabel("类别：", pMargin, pRow2Y, labelFont);
+        // 第3行：类别
+        const int pRow3Y = 25 + rowGap * 2;
+        Label lblCategory = UiHelper.CreateLabelRightAligned("类别：", labelRightX, pRow3Y, labelFont);
         _cmbCategory = new ComboBox
         {
             Font = labelFont,
-            Size = new Size(150, CtrlHeight),
-            Location = new Point(UiHelper.NextX(lblCategory), pRow2Y - 3),
+            Size = new Size(inputWidth, CtrlHeight),
+            Location = new Point(inputX, pRow3Y - 3),
             DropDownStyle = ComboBoxStyle.DropDownList
         };
 
-        int p2Col2X = _cmbCategory.Right + pGap;
-        Label lblSupplier = UiHelper.CreateLabel("供货商：", p2Col2X, pRow2Y, labelFont);
+        // 第4行：供货商
+        const int pRow4Y = 25 + rowGap * 3;
+        Label lblSupplier = UiHelper.CreateLabelRightAligned("供货商：", labelRightX, pRow4Y, labelFont);
         _cmbSupplier = new ComboBox
         {
             Font = labelFont,
-            Size = new Size(150, CtrlHeight),
-            Location = new Point(UiHelper.NextX(lblSupplier), pRow2Y - 3),
+            Size = new Size(inputWidth, CtrlHeight),
+            Location = new Point(inputX, pRow4Y - 3),
             DropDownStyle = ComboBoxStyle.DropDownList
         };
 
-        int p2Col3X = _cmbSupplier.Right + pGap;
-        Label lblStockQty = UiHelper.CreateLabel("库存：", p2Col3X, pRow2Y, labelFont);
+        // 第5行：单价
+        const int pRow5Y = 25 + rowGap * 4;
+        Label lblUnitPrice = UiHelper.CreateLabelRightAligned("单价：", labelRightX, pRow5Y, labelFont);
+        _txtUnitPrice = new TextBox
+        {
+            Font = labelFont,
+            Size = new Size(inputWidth, CtrlHeight),
+            Location = new Point(inputX, pRow5Y - 3)
+        };
+
+        // 第6行：库存
+        const int pRow6Y = 25 + rowGap * 5;
+        Label lblStockQty = UiHelper.CreateLabelRightAligned("库存：", labelRightX, pRow6Y, labelFont);
         _txtStockQty = new TextBox
         {
             Font = labelFont,
-            Size = new Size(120, CtrlHeight),
-            Location = new Point(UiHelper.NextX(lblStockQty), pRow2Y - 3)
+            Size = new Size(inputWidth, CtrlHeight),
+            Location = new Point(inputX, pRow6Y - 3)
         };
 
-        // 第3行：产地、生产日期
-        const int pRow3Y = 100;
-        Label lblOrigin = UiHelper.CreateLabel("产地：", pMargin, pRow3Y, labelFont);
+        // 第7行：产地
+        const int pRow7Y = 25 + rowGap * 6;
+        Label lblOrigin = UiHelper.CreateLabelRightAligned("产地：", labelRightX, pRow7Y, labelFont);
         _txtOrigin = new TextBox
         {
             Font = labelFont,
-            Size = new Size(150, CtrlHeight),
-            Location = new Point(UiHelper.NextX(lblOrigin), pRow3Y - 3)
+            Size = new Size(inputWidth, CtrlHeight),
+            Location = new Point(inputX, pRow7Y - 3)
         };
 
-        int p3Col2X = _txtOrigin.Right + pGap;
-        Label lblProduceDate = UiHelper.CreateLabel("生产日期：", p3Col2X, pRow3Y, labelFont);
+        // 第8行：生产日期
+        const int pRow8Y = 25 + rowGap * 7;
+        Label lblProduceDate = UiHelper.CreateLabelRightAligned("生产日期：", labelRightX, pRow8Y, labelFont);
         _dtpProduceDate = new DateTimePicker
         {
             Font = labelFont,
-            Size = new Size(150, CtrlHeight),
-            Location = new Point(UiHelper.NextX(lblProduceDate), pRow3Y - 3),
+            Size = new Size(inputWidth, CtrlHeight),
+            Location = new Point(inputX, pRow8Y - 3),
             Format = DateTimePickerFormat.Short
         };
 
@@ -245,17 +254,17 @@ public class FrmGoods : Form
         {
             lblProductID, _txtProductID,
             lblProductName, _txtProductName,
-            lblUnitPrice, _txtUnitPrice,
             lblCategory, _cmbCategory,
             lblSupplier, _cmbSupplier,
+            lblUnitPrice, _txtUnitPrice,
             lblStockQty, _txtStockQty,
             lblOrigin, _txtOrigin,
             lblProduceDate, _dtpProduceDate
         });
 
         // ===== 操作按钮区 =====
-        const int btnY = 545;
-        _btnAdd = UiHelper.CreateButton("添加", 20, btnY, labelFont);
+        const int btnY = 725;
+        _btnAdd = UiHelper.CreateButton("添加", 15, btnY, labelFont);
         _btnAdd.Click += BtnAdd_Click;
         _btnUpdate = UiHelper.CreateButton("修改", _btnAdd.Right + 10, btnY, labelFont);
         _btnUpdate.Click += BtnUpdate_Click;
@@ -263,7 +272,7 @@ public class FrmGoods : Form
         _btnDelete.Click += BtnDelete_Click;
         _btnClear = UiHelper.CreateButton("清空", _btnDelete.Right + 10, btnY, labelFont);
         _btnClear.Click += BtnClear_Click;
-        _btnReturn = UiHelper.CreateButton("返回", 810, btnY, labelFont);
+        _btnReturn = UiHelper.CreateButton("返回", 480, btnY, labelFont);
         _btnReturn.BackColor = Color.FromArgb(200, 200, 200);
         _btnReturn.Click += BtnReturn_Click;
 

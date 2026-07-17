@@ -1,6 +1,7 @@
 using LibrarySys.BLL;
 using LibrarySys.Common;
 using LibrarySys.Models;
+using System.ComponentModel;
 
 namespace LibrarySys.Forms;
 
@@ -8,7 +9,7 @@ namespace LibrarySys.Forms;
 /// 主窗体：左侧 TreeView 导航 + 右侧 Panel 嵌入子窗体
 /// 非 MDI 模式，子窗体以 TopLevel=false 嵌入右侧 Panel
 /// </summary>
-public class FrmMain : Form
+public partial class FrmMain : Form
 {
     private readonly UserInfo _currentUser;
     private TreeView _treeView;
@@ -27,21 +28,34 @@ public class FrmMain : Form
     /// <summary>当前登录用户信息</summary>
     public UserInfo CurrentUser => _currentUser;
 
+    /// <summary>无参构造，仅供 VS 设计器使用</summary>
+    public FrmMain()
+    {
+        InitializeComponent();
+        BuildUI();
+    }
+
     public FrmMain(UserInfo currentUser)
     {
         _currentUser = currentUser;
         // 使用 WinForms 原生双缓冲，避免 WS_EX_COMPOSITED 导致的控件渲染异常和卡顿
         SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
         DoubleBuffered = true;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         try { new ReservationBiz().CleanExpired(); } catch { }
         try { LogBiz.Log(_currentUser.UserName, BusinessConstants.LOG_LOGIN, "登录系统", $"用户 {_currentUser.UserName} 登录系统"); } catch { }
         ShowDashboard();
     }
 
-    private void InitializeUI()
+    private void BuildUI()
     {
-        Text = $"智慧图书馆管理系统 - 当前用户：{_currentUser.UserName}（{_currentUser.UserPurview}）";
+        // 设计器模式下跳过：设计器已在 InitializeComponent 中创建控件骨架
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+        // 运行时：清除 InitializeComponent 创建的骨架控件，重新完整构建
+        Controls.Clear();
+
+        Text = $"智慧图书馆管理系统 - 当前用户：{_currentUser?.UserName ?? "（设计器预览）"}（{_currentUser?.UserPurview ?? ""}）";
         StartPosition = FormStartPosition.CenterScreen;
         WindowState = FormWindowState.Maximized;
         MinimumSize = new Size(1024, 600);
@@ -74,7 +88,7 @@ public class FrmMain : Form
             BackColor = ThemeColor.SidebarBg
         };
 
-        Panel logoPanel = new()
+        Panel logoPanel = new Panel()
         {
             Dock = DockStyle.Top,
             Height = 60,
@@ -184,6 +198,8 @@ public class FrmMain : Form
     /// </summary>
     private void ApplyPermissionControl()
     {
+        // 设计器无参构造时 _currentUser 为 null，跳过权限控制
+        if (_currentUser == null) return;
         if (_currentUser.UserPurview == BusinessConstants.ROLE_ADMIN)
             return;
 

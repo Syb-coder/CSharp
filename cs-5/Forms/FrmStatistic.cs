@@ -1,6 +1,7 @@
 using LibrarySys.BLL;
 using LibrarySys.Common;
 using LibrarySys.Models;
+using System.ComponentModel;
 
 namespace LibrarySys.Forms;
 
@@ -9,7 +10,7 @@ namespace LibrarySys.Forms;
 /// 布局：顶部四个统计卡片（Dock=Top）+ 中部借阅热度 Top10（Dock=Top）+ 底部逾期读者列表（Dock=Fill）+ 按钮行（Dock=Bottom）
 /// 全 Dock 布局，零硬编码 Y 坐标，DPI 安全
 /// </summary>
-public class FrmStatistic : Form
+public partial class FrmStatistic : Form
 {
     private readonly StatisticBiz _biz = new();
 
@@ -19,12 +20,18 @@ public class FrmStatistic : Form
 
     public FrmStatistic()
     {
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
         Load += (_, _) => LoadData();
     }
 
-    private void InitializeUI()
+    private void BuildUI()
     {
+        // 设计器模式下跳过：设计器已在 InitializeComponent 中创建控件骨架
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+        // 运行时：清除 InitializeComponent 创建的骨架控件，重新完整构建
+        Controls.Clear();
+
         DoubleBuffered = true;
         Text = "统计面板";
         StartPosition = FormStartPosition.CenterScreen;
@@ -40,7 +47,7 @@ public class FrmStatistic : Form
         // =====================================================================
 
         // 1. 按钮行（最底部）
-        FlowLayoutPanel btnFlow = new()
+        FlowLayoutPanel btnFlow = new FlowLayoutPanel()
         {
             Dock = DockStyle.Bottom, Height = 45,
             FlowDirection = FlowDirection.LeftToRight, WrapContents = false,
@@ -48,7 +55,7 @@ public class FrmStatistic : Form
         };
         Button btnRefresh = UiHelper.CreateButton("刷新");
         Button btnReturn = UiHelper.CreateButton("返回");
-        Panel spacer = new() { Width = 9999, Height = 1 };
+        Panel spacer = new Panel() { Width = 9999, Height = 1 };
         btnRefresh.Click += (_, _) => LoadData();
         btnReturn.Click += (_, _) => Close();
         btnFlow.Controls.Add(btnRefresh);
@@ -59,8 +66,8 @@ public class FrmStatistic : Form
         Controls.Add(btnFlow);
 
         // 2. 逾期读者列表（Fill 填充剩余空间）
-        Panel overduePanel = new() { Dock = DockStyle.Fill, Padding = new Padding(10, 5, 10, 5) };
-        Label lblOverdue = new() { Text = "逾期读者列表", AutoSize = true, Dock = DockStyle.Top, Font = new Font(UiHelper.DefaultFont.FontFamily, 10F, FontStyle.Bold), Padding = new Padding(0, 3, 0, 5) };
+        Panel overduePanel = new Panel() { Dock = DockStyle.Fill, Padding = new Padding(10, 5, 10, 5) };
+        Label lblOverdue = new Label() { Text = "逾期读者列表", AutoSize = true, Dock = DockStyle.Top, Font = new Font(UiHelper.DefaultFont.FontFamily, 10F, FontStyle.Bold), Padding = new Padding(0, 3, 0, 5) };
         _dgvOverdue = new DataGridView
         {
             Dock = DockStyle.Fill,
@@ -77,8 +84,8 @@ public class FrmStatistic : Form
         Controls.Add(overduePanel);
 
         // 3. 借阅热度排行 Top10（Top，固定高度）
-        Panel rankingPanel = new() { Dock = DockStyle.Top, Height = 220, Padding = new Padding(10, 5, 10, 5) };
-        Label lblRanking = new() { Text = "借阅热度排行 Top10", AutoSize = true, Dock = DockStyle.Top, Font = new Font(UiHelper.DefaultFont.FontFamily, 10F, FontStyle.Bold), Padding = new Padding(0, 3, 0, 5) };
+        Panel rankingPanel = new Panel() { Dock = DockStyle.Top, Height = 220, Padding = new Padding(10, 5, 10, 5) };
+        Label lblRanking = new Label() { Text = "借阅热度排行 Top10", AutoSize = true, Dock = DockStyle.Top, Font = new Font(UiHelper.DefaultFont.FontFamily, 10F, FontStyle.Bold), Padding = new Padding(0, 3, 0, 5) };
         _dgvRanking = new DataGridView
         {
             Dock = DockStyle.Fill,
@@ -93,7 +100,7 @@ public class FrmStatistic : Form
         Controls.Add(rankingPanel);
 
         // 4. 顶部统计卡片（Top，2×2 网格）
-        TableLayoutPanel cardsPanel = new()
+        TableLayoutPanel cardsPanel = new TableLayoutPanel()
         {
             Dock = DockStyle.Top, Height = 170,
             ColumnCount = 2, RowCount = 2,

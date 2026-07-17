@@ -1,6 +1,7 @@
 using LibrarySys.BLL;
 using LibrarySys.Common;
 using LibrarySys.Models;
+using System.ComponentModel;
 
 namespace LibrarySys.Forms;
 
@@ -8,7 +9,7 @@ namespace LibrarySys.Forms;
 /// 登录窗体：卡片式布局 + 主题色块 + 扁平输入框
 /// 视觉风格：浅灰背景 + 白色卡片 + 主色顶部色条
 /// </summary>
-public class FrmLogin : Form
+public partial class FrmLogin : Form
 {
     private readonly UserBiz _userBiz = new();
 
@@ -25,11 +26,17 @@ public class FrmLogin : Form
     public FrmLogin()
     {
         DoubleBuffered = true;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
     }
 
-    private void InitializeUI()
+    private void BuildUI()
     {
+        // 设计器模式下跳过：设计器已在 InitializeComponent 中创建控件骨架
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+        // 运行时：清除 InitializeComponent 创建的骨架控件，重新完整构建
+        Controls.Clear();
+
         Text = "图书馆信息管理系统 - 登录";
         StartPosition = FormStartPosition.CenterScreen;
         FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -39,7 +46,7 @@ public class FrmLogin : Form
         BackColor = ThemeColor.BgPage;
 
         // ===== 中央卡片 =====
-        Panel card = new()
+        Panel card = new Panel()
         {
             Size = new Size(360, 430),
             Location = new Point(60, 50),
@@ -55,7 +62,7 @@ public class FrmLogin : Form
         Controls.Add(card);
 
         // ===== 卡片内：标题区域 =====
-        Label lblTitle = new()
+        Label lblTitle = new Label()
         {
             Text = "智慧图书馆",
             Font = new Font("Microsoft YaHei UI", 20F, FontStyle.Bold),
@@ -66,7 +73,7 @@ public class FrmLogin : Form
         };
         card.Controls.Add(lblTitle);
 
-        Label lblSubtitle = new()
+        Label lblSubtitle = new Label()
         {
             Text = "Library Management System",
             Font = new Font("Microsoft YaHei UI", 9F),
@@ -78,7 +85,7 @@ public class FrmLogin : Form
         card.Controls.Add(lblSubtitle);
 
         // 分隔线（细色条）
-        Panel divider = new()
+        Panel divider = new Panel()
         {
             BackColor = Color.FromArgb(238, 238, 238),
             Location = new Point(40, 115),
@@ -91,7 +98,7 @@ public class FrmLogin : Form
         _txtPassword = UiHelper.CreateTextBox(280, isPassword: true);
 
         // 用户名
-        Label lblUser = new()
+        Label lblUser = new Label()
         {
             Text = "用户名",
             Font = ThemeColor.FontRegular,
@@ -104,7 +111,7 @@ public class FrmLogin : Form
         card.Controls.Add(_txtUserName);
 
         // 密码
-        Label lblPwd = new()
+        Label lblPwd = new Label()
         {
             Text = "密码",
             Font = ThemeColor.FontRegular,
@@ -117,7 +124,7 @@ public class FrmLogin : Form
         card.Controls.Add(_txtPassword);
 
         // 身份选择
-        Label lblPurview = new()
+        Label lblPurview = new Label()
         {
             Text = "身份",
             Font = ThemeColor.FontRegular,
@@ -144,7 +151,7 @@ public class FrmLogin : Form
         card.Controls.Add(btnExit);
 
         // ===== 底部版权 =====
-        Label lblCopyright = new()
+        Label lblCopyright = new Label()
         {
             Text = "© 2026 智慧图书馆管理系统  课程设计作品",
             Font = new Font("Microsoft YaHei UI", 8F),

@@ -1,6 +1,7 @@
 using LibrarySys.BLL;
 using LibrarySys.Common;
 using LibrarySys.Models;
+using System.ComponentModel;
 
 namespace LibrarySys.Forms;
 
@@ -8,7 +9,7 @@ namespace LibrarySys.Forms;
 /// 借阅管理窗体（借书、还书、记录查询）
 /// 固定坐标布局：查询区(顶部) → DataGridView(中间) → 操作区(底部)
 /// </summary>
-public class FrmBorrow : Form
+public partial class FrmBorrow : Form
 {
     private readonly BorrowBiz _biz = new();
     private readonly UserInfo _currentUser;
@@ -27,7 +28,9 @@ public class FrmBorrow : Form
     public FrmBorrow()
     {
         _canEdit = true;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
+        InitializeEvents();
         Load += (_, _) => LoadData();
     }
 
@@ -36,12 +39,19 @@ public class FrmBorrow : Form
         _currentUser = currentUser;
         // 借书还书是所有用户的基础功能，不限制权限
         _canEdit = true;
-        InitializeUI();
+        InitializeComponent();
+        BuildUI();
+        InitializeEvents();
         Load += (_, _) => LoadData();
     }
 
-    private void InitializeUI()
+    private void BuildUI()
     {
+        // 设计器模式下跳过：设计器已在 InitializeComponent 中创建控件骨架
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+        // 运行时：清除 InitializeComponent 创建的骨架控件，重新完整构建
+        Controls.Clear();
+
         DoubleBuffered = true;
         Text = "借阅管理";
         StartPosition = FormStartPosition.CenterScreen;
@@ -57,8 +67,6 @@ public class FrmBorrow : Form
         _txtDueDate = UiHelper.CreateTextBox();
         _txtDueDate.ReadOnly = true;
         _txtDueDate.BackColor = SystemColors.Control;
-        UpdateDueDate();
-        _dtpBorrowDate.ValueChanged += (_, _) => UpdateDueDate();
 
         _txtQueryReader = UiHelper.CreateTextBox();
         _txtQueryBook = UiHelper.CreateTextBox();
@@ -67,7 +75,7 @@ public class FrmBorrow : Form
         _cboQueryStatus.SelectedIndex = 0;
 
         // ===== 顶部查询区（固定坐标） =====
-        GroupBox grpQuery = new()
+        GroupBox grpQuery = new GroupBox()
         {
             Text = "查询条件",
             Location = new Point(0, 0),
@@ -84,25 +92,16 @@ public class FrmBorrow : Form
 
         Button btnQuery = UiHelper.CreateButton("查询");
         Button btnShowAll = UiHelper.CreateButton("全部");
-        btnQuery.Click += (_, _) => DoQuery();
-        btnShowAll.Click += (_, _) => DoShowAll();
+        btnQuery.Click += OnQueryClick;
+        btnShowAll.Click += OnShowAllClick;
         UiHelper.LayoutButtons(grpQuery.Controls, new[] { btnQuery, btnShowAll }, 20, 72);
 
         // ===== DataGridView（中间填充） =====
         _dgv = new DataGridView { Dock = DockStyle.Fill };
         UiHelper.StyleDataGridView(_dgv);
-        // 选中借出记录时启用还书按钮（所有用户均可还书，不受权限限制）
-        _dgv.SelectionChanged += (_, _) =>
-        {
-            if (_isLoading) return;
-            if (_dgv.CurrentRow?.DataBoundItem is BorrowInfo item)
-                _btnReturn.Enabled = item.Status == BusinessConstants.STATUS_BORROWED;
-            else
-                _btnReturn.Enabled = false;
-        };
 
         // ===== 底部操作区（固定坐标） =====
-        GroupBox grpEdit = new()
+        GroupBox grpEdit = new GroupBox()
         {
             Text = "借书操作",
             Dock = DockStyle.Bottom,
@@ -119,13 +118,13 @@ public class FrmBorrow : Form
 
         _btnBorrow = UiHelper.CreateButton("借书");
         _btnBorrow.Enabled = _canEdit;
-        _btnBorrow.Click += (_, _) => DoBorrow();
+        _btnBorrow.Click += OnBorrowClick;
         _btnReturn = UiHelper.CreateButton("还书");
         // 默认禁用，选中借出记录后由 SelectionChanged 启用
         _btnReturn.Enabled = false;
-        _btnReturn.Click += (_, _) => DoReturnBook();
+        _btnReturn.Click += OnReturnClick;
         Button btnBack = UiHelper.CreateButton("返回");
-        btnBack.Click += (_, _) => Close();
+        btnBack.Click += OnBackClick;
         UiHelper.LayoutButtonsWithReturn(
             grpEdit.Controls,
             new[] { _btnBorrow, _btnReturn },
@@ -135,6 +134,32 @@ public class FrmBorrow : Form
         Controls.Add(grpEdit);
         Controls.Add(grpQuery);
         Controls.Add(_dgv);
+    }
+
+    /// <summary>
+    /// 注册事件处理（在 InitializeComponent 之后调用，避免设计器解析 lambda 表达式失败）
+    /// </summary>
+    private void InitializeEvents()
+    {
+        UpdateDueDate();
+        _dtpBorrowDate.ValueChanged += OnBorrowDateChanged;
+        _dgv.SelectionChanged += OnDgvSelectionChanged;
+    }
+
+    private void OnBorrowDateChanged(object? sender, EventArgs e) => UpdateDueDate();
+    private void OnQueryClick(object? sender, EventArgs e) => DoQuery();
+    private void OnShowAllClick(object? sender, EventArgs e) => DoShowAll();
+    private void OnBorrowClick(object? sender, EventArgs e) => DoBorrow();
+    private void OnReturnClick(object? sender, EventArgs e) => DoReturnBook();
+    private void OnBackClick(object? sender, EventArgs e) => Close();
+
+    private void OnDgvSelectionChanged(object? sender, EventArgs e)
+    {
+        if (_isLoading) return;
+        if (_dgv.CurrentRow?.DataBoundItem is BorrowInfo item)
+            _btnReturn.Enabled = item.Status == BusinessConstants.STATUS_BORROWED;
+        else
+            _btnReturn.Enabled = false;
     }
 
     /// <summary>

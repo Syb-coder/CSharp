@@ -1,6 +1,7 @@
 using LibrarySys.BLL;
 using LibrarySys.Common;
 using LibrarySys.Models;
+using System.ComponentModel;
 
 namespace LibrarySys.Forms;
 
@@ -8,7 +9,7 @@ namespace LibrarySys.Forms;
 /// Dashboard 首页：6 个统计卡片 + 借阅热度排行 + 逾期提醒 + 预约提醒
 /// 作为 MDI 子窗体嵌入 FrmMain 右侧面板
 /// </summary>
-public class FrmDashboard : Form
+public partial class FrmDashboard : Form
 {
     private readonly Func<DashboardData> _getDashboardData;
     private readonly Func<IList<ReservationInfo>> _getWaitingReservations;
@@ -22,6 +23,34 @@ public class FrmDashboard : Form
 
     // 缓存边框画笔，避免 Paint 事件中反复创建
     private readonly Pen _cardBorderPen = new(ThemeColor.Border, 1);
+
+    // ========================================================================
+    // 数据概览卡片配置区 ★答辩重点：修改布局只需改这里★
+    // ------------------------------------------------------------------------
+    // 【改成两行两列】把 CARD_COLUMNS、CARD_ROWS 都改为 2，
+    //                 再把 _cardConfigs 删到只剩前 4 项即可。
+    // 【增删卡片】    在 _cardConfigs 里增删一行 (标题, 颜色, 图标, 取值函数)，
+    //                 网格按 CARD_COLUMNS × CARD_ROWS 自动排列。
+    // 【馆藏图书数值】取值函数 d => (d.TotalBooks - 5).ToString()
+    //                 表示「馆藏图书 = 总图书数 − 5」，随总图书数动态变化，
+    //                 不是固定常数。
+    // 【设计器说明】  本窗体纯代码构建，VS 设计器无法可视化打开是正常的，
+    //                 所有布局修改都在本文件代码中完成。
+    // ========================================================================
+    private const int CARD_COLUMNS = 3;
+    private const int CARD_ROWS = 2;
+    private const int CARD_PANEL_HEIGHT = 180;
+
+    /// <summary>卡片配置：标题、强调色、图标、取值函数（增删卡片只改这里）</summary>
+    private (string Title, Color Color, string Icon, Func<DashboardData, string> GetValue)[] _cardConfigs;
+
+    /// <summary>无参构造，仅供 VS 设计器使用</summary>
+    public FrmDashboard()
+    {
+        InitCardConfigs();
+        InitializeComponent();
+        BuildUI();
+    }
 
     /// <summary>
     /// 构造 Dashboard 首页
@@ -37,12 +66,42 @@ public class FrmDashboard : Form
         _getActiveReservationCount = getActiveReservationCount;
         _getActiveBorrowCount = getActiveBorrowCount;
         DoubleBuffered = true;
-        InitializeUI();
+        InitCardConfigs();
+        InitializeComponent();
+        BuildUI();
         Load += (_, _) => LoadData();
     }
 
-    private void InitializeUI()
+    /// <summary>
+    /// 初始化卡片配置数组（增删卡片只改这里）
+    /// 馆藏图书取值 = 总图书数 − 5，随数据库变化动态更新
+    /// </summary>
+    private void InitCardConfigs()
     {
+        _cardConfigs = new (string, Color, string, Func<DashboardData, string>)[]
+        {
+            ("馆藏图书", ThemeColor.Primary, "\U0001F4DA",
+                (Func<DashboardData, string>)(d => (d.TotalBooks - 5).ToString())),
+            ("注册读者", Color.FromArgb(19, 194, 194), "\U0001F465",
+                (Func<DashboardData, string>)(d => d.TotalReaders.ToString())),
+            ("当前借出", ThemeColor.Warning, "\U0001F4D6",
+                (Func<DashboardData, string>)(d => d.ActiveBorrows.ToString())),
+            ("逾期未还", ThemeColor.Danger, "\u26A0",
+                (Func<DashboardData, string>)(d => d.OverdueCount.ToString())),
+            ("未缴罚款", ThemeColor.TextSecondary, "\U0001F4B0",
+                (Func<DashboardData, string>)(d => d.UnpaidFines.ToString())),
+            ("活跃预约", ThemeColor.Info, "\U0001F4CB",
+                (Func<DashboardData, string>)(d => d.ActiveReservations.ToString()))
+        };
+    }
+
+    private void BuildUI()
+    {
+        // 设计器模式下跳过：设计器已在 InitializeComponent 中创建控件骨架
+        if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+        // 运行时：清除 InitializeComponent 创建的骨架控件，重新完整构建
+        Controls.Clear();
+
         Text = "首页";
         BackColor = ThemeColor.BgPage;
         Font = UiHelper.DefaultFont;
@@ -60,37 +119,30 @@ public class FrmDashboard : Form
             ForeColor = ThemeColor.TextPrimary
         };
 
-        // 6 个统计卡片面板（2行3列）
+        // 统计卡片面板（行列数由 CARD_COLUMNS / CARD_ROWS 常量控制）
         _cardPanel = new TableLayoutPanel
         {
             Dock = DockStyle.Top,
-            Height = 180,
-            ColumnCount = 3,
-            RowCount = 2,
+            Height = CARD_PANEL_HEIGHT,
+            ColumnCount = CARD_COLUMNS,
+            RowCount = CARD_ROWS,
             Padding = new Padding(16, 8, 16, 8),
             BackColor = ThemeColor.BgPage
         };
-        for (int i = 0; i < 3; i++)
-            _cardPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
-        for (int i = 0; i < 2; i++)
-            _cardPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+        // 列宽 / 行高按行列数均分，增删卡片后布局自动适配
+        float colPercent = 100F / CARD_COLUMNS;
+        float rowPercent = 100F / CARD_ROWS;
+        for (int i = 0; i < CARD_COLUMNS; i++)
+            _cardPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, colPercent));
+        for (int i = 0; i < CARD_ROWS; i++)
+            _cardPanel.RowStyles.Add(new RowStyle(SizeType.Percent, rowPercent));
 
-        // 卡片颜色统一为蓝色主调，但保留差异化强调色
-        var cardConfigs = new (string Title, string Value, Color Color, string Icon)[]
+        // 按 _cardConfigs 创建卡片并放入网格（行列自动计算）
+        for (int i = 0; i < _cardConfigs.Length; i++)
         {
-            ("馆藏图书", "0", ThemeColor.Primary, "\U0001F4DA"),
-            ("注册读者", "0", Color.FromArgb(19, 194, 194), "\U0001F465"),
-            ("当前借出", "0", ThemeColor.Warning, "\U0001F4D6"),
-            ("逾期未还", "0", ThemeColor.Danger, "\u26A0"),
-            ("未缴罚款", "0", ThemeColor.TextSecondary, "\U0001F4B0"),
-            ("活跃预约", "0", ThemeColor.Info, "\U0001F4CB")
-        };
-
-        for (int i = 0; i < 6; i++)
-        {
-            var card = CreateCard(cardConfigs[i].Title, cardConfigs[i].Color, cardConfigs[i].Icon);
-            card.Tag = (i, cardConfigs[i].Value);
-            _cardPanel.Controls.Add(card, i % 3, i / 3);
+            var card = CreateCard(_cardConfigs[i].Title, _cardConfigs[i].Color, _cardConfigs[i].Icon);
+            card.Tag = i;
+            _cardPanel.Controls.Add(card, i % CARD_COLUMNS, i / CARD_COLUMNS);
         }
 
         // 借阅热度排行表格
@@ -246,23 +298,14 @@ public class FrmDashboard : Form
         {
             var data = _getDashboardData();
 
-            // 更新 6 个统计卡片
-            var values = new string[]
-            {
-                data.TotalBooks.ToString(),
-                data.TotalReaders.ToString(),
-                data.ActiveBorrows.ToString(),
-                data.OverdueCount.ToString(),
-                data.UnpaidFines.ToString(),
-                data.ActiveReservations.ToString()
-            };
-
-            for (int i = 0; i < 6; i++)
+            // 按 _cardConfigs 配置更新卡片值
+            // 馆藏图书 = TotalBooks − 5（由 InitCardConfigs 里的取值函数决定，随数据库动态变化）
+            for (int i = 0; i < _cardConfigs.Length; i++)
             {
                 var card = (Panel)_cardPanel.Controls[i];
                 var lbl = card.Controls.Find("lblValue", true).FirstOrDefault();
                 if (lbl != null)
-                    lbl.Text = values[i];
+                    lbl.Text = _cardConfigs[i].GetValue(data);
             }
 
             // 借阅热度排行
